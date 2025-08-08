@@ -1,0 +1,52 @@
+{
+  "version": "0.2.0",
+  "compounds": [
+    {
+      "name": "Full Dev (Electron + Vite)",
+      "configurations": ["Vite Dev Server", "Compile Electron Main", "Debug Electron Main"]
+    }
+  ],
+  "configurations": [
+    {
+      "name": "Vite Dev Server",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/packages/frontend",
+      "runtimeExecutable": "yarn",
+      "args": ["dev"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Compile Electron Main",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "yarn run",
+      "args": ["build"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Debug Electron Main",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/app.js",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "electron",
+      "windows": {
+        "runtimeExecutable": "${workspaceFolder}/node_modules/electron/dist/electron.exe"
+      },
+      "args": [],
+      "outputCapture": "std",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    // {
+    //   "name": "Debug Vite + React",
+    //   "type": "chrome",
+    //   "request": "launch",
+    //   "url": "http://localhost:3000",
+    //   "webRoot": "${workspaceFolder}/packages/frontend/src"
+    // }
+  ]
+}
