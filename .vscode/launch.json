@@ -3,7 +3,12 @@
   "compounds": [
     {
       "name": "Full Dev (Electron + Vite)",
-      "configurations": ["Vite Dev Server", "Compile Electron Main", "Debug Electron Main"]
+      "configurations": [
+        "Vite Dev Server",
+        "Compile Electron Main",
+        "Debug Electron Main",
+        "Debug Vite + React"
+      ]
     }
   ],
   "configurations": [
@@ -13,9 +18,13 @@
       "request": "launch",
       "cwd": "${workspaceFolder}/packages/frontend",
       "runtimeExecutable": "yarn",
-      "args": ["dev"],
+      "args": [
+        "dev"
+      ],
       "console": "integratedTerminal",
-      "skipFiles": ["<node_internals>/**"]
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
     },
     {
       "name": "Compile Electron Main",
@@ -23,9 +32,13 @@
       "request": "launch",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "yarn run",
-      "args": ["build"],
+      "args": [
+        "build"
+      ],
       "console": "integratedTerminal",
-      "skipFiles": ["<node_internals>/**"]
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
     },
     {
       "name": "Debug Electron Main",
@@ -37,16 +50,24 @@
       "windows": {
         "runtimeExecutable": "${workspaceFolder}/node_modules/electron/dist/electron.exe"
       },
+      "runtimeArgs": [
+        ".",
+        "--enable-logging",
+        "--remote-debugging-port=9222",
+      ],
       "args": [],
       "outputCapture": "std",
-      "skipFiles": ["<node_internals>/**"]
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
     },
-    // {
-    //   "name": "Debug Vite + React",
-    //   "type": "chrome",
-    //   "request": "launch",
-    //   "url": "http://localhost:3000",
-    //   "webRoot": "${workspaceFolder}/packages/frontend/src"
-    // }
+    {
+      "name": "Debug Vite + React",
+      "type": "chrome",
+      "request": "attach",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/packages/frontend/src",
+      "port": 9222,
+    }
   ]
 }

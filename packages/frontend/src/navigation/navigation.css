@@ -1,0 +1,15 @@
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.gutter {
+  background-color: #1976d2; /* MUI primary blue */
+  cursor: col-resize;
+}
+
+.drag-over {
+  border: 2px dashed blue;
+  background-color: #e0f7ff;
+}
