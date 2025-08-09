@@ -8,13 +8,13 @@ function App() {
   return (
     <>
     <Split
-      sizes={[250, 65]} // initial size percentages
+      // sizes={[250, 65]} // initial size percentages
       gutterSize={8}
       direction="horizontal"
       style={{ display: 'flex', height: '100vh' }}
     >
       {/* Left Pane: Tree */}
-      <Box component={Paper} elevation={3} sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <Box component={Paper} elevation={3} sx={{ display: 'flex', flexDirection: 'column', minWidth:250, overflow: 'hidden' }}>
        <Navigator/>
       </Box>
 
