@@ -1,12 +1,88 @@
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
+import { useTreeViewApiRef } from '@mui/x-tree-view';
 import type { TreeViewBaseItem } from '@mui/x-tree-view/models';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import type { TreeItemProps } from '@mui/x-tree-view/TreeItem';
 import { Box } from '@mui/material';
 import * as React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
 
-export default function StoryTree() {
+type StoryTreeProperties = {
+
+}
+
+export type StoryTreeHandle = {
+
+  doSomething: () => void;
+}
+
+function findPositionInParent(collection: TreeViewBaseItem[], id: string | undefined): [TreeViewBaseItem, number] {
+
+  const recursiveSearch = (currentParent: TreeViewBaseItem): [TreeViewBaseItem, number] | null => {
+    if (currentParent.children) {
+      for (let index = 0; index < currentParent.children.length; index++) {
+        const element = currentParent.children[index];
+        if (element.id === id) {
+          return [currentParent, index]
+        }
+
+        const fromChild = recursiveSearch(element);
+        if (fromChild) {
+          return fromChild
+        }
+      }
+    }
+    return null;
+  }
+
+  return recursiveSearch(collection[0])!
+}
+
+function StoryTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHandle>) {
+  const [selectedItem, setSelectedItem] = React.useState<string>();
+  const apiRef = useTreeViewApiRef();
+
+  useImperativeHandle(ref, () => ({
+    doSomething() {
+      if (selectedItem) {
+        const reordered = [...items];
+
+        const next = {
+          id: "7",
+          label: "New ",
+        }
+
+        if (selectedItem !== "0") {
+          const [parent, index] = findPositionInParent(reordered, selectedItem);
+          parent.children![index].children ??= [];
+          parent.children![index].children.push(next)
+
+          apiRef.current?.setItemExpansion({
+            itemId: parent.children![index].id,
+            shouldBeExpanded: true
+          });
+
+        }
+        else {
+          reordered[0].children ??= [];
+          reordered[0].children.push(next);
+          apiRef.current?.setItemExpansion({
+            itemId: reordered[0].id,
+            shouldBeExpanded: true
+          });
+        }
+
+        setItems(reordered);
+        apiRef.current?.setItemSelection({
+          itemId: next.id,
+          shouldBeSelected: true,
+          keepExistingSelection: false
+        })
+      }
+    },
+  }));
+
+
   const initialItems: TreeViewBaseItem[] = [
     {
       id: "0", label: "Root", children: [
@@ -37,33 +113,14 @@ export default function StoryTree() {
   const [items, setItems] = React.useState<TreeViewBaseItem[]>(initialItems);
   const dragItem = React.useRef<TreeItemProps | null>(null);
 
+
   const handleDragStart = (event: React.DragEvent<HTMLLIElement>, props: TreeItemProps) => {
     dragItem.current = props;
     // event.preventDefault();
     event.stopPropagation();
   };
 
-  function findPositionInParent(collection: TreeViewBaseItem[], id: string | undefined): [TreeViewBaseItem, number] {
 
-    const recursiveSearch = (currentParent: TreeViewBaseItem): [TreeViewBaseItem, number] | null => {
-      if (currentParent.children) {
-        for (let index = 0; index < currentParent.children.length; index++) {
-          const element = currentParent.children[index];
-          if (element.id === id) {
-            return [currentParent, index]
-          }
-
-          const fromChild = recursiveSearch(element);
-          if (fromChild) {
-            return fromChild
-          }
-        }
-      }
-      return null;
-    }
-
-    return recursiveSearch(collection[0])!
-  }
 
   const handleDrop = (event: React.DragEvent<HTMLElement>, props: TreeItemProps, position: "on" | "before" | "after") => {
     event.currentTarget.classList.remove('drag-over');
@@ -128,6 +185,13 @@ export default function StoryTree() {
     dragItem.current = null;
   }
 
+  const handleSelectedItemsChange = (
+    event: React.SyntheticEvent<Element, Event> | null,
+    id: string | null,
+  ) => {
+    if (id)
+      setSelectedItem(id);
+  };
 
   const IndentedDiv = ({ treeItemRef, props, position }: { treeItemRef: React.RefObject<HTMLLIElement | null>, props: TreeItemProps, position: "on" | "before" | "after" }) => {
     const divRef = useRef<HTMLDivElement>(null);
@@ -211,9 +275,14 @@ export default function StoryTree() {
   return (
     <Box sx={{ height: 400, overflow: 'auto' }}>
       <RichTreeView
+        apiRef={apiRef}
         items={items}
         slots={{ item: CustomTreeItem }}
+        selectedItems={selectedItem}
+        onSelectedItemsChange={handleSelectedItemsChange}
       />
     </Box>
   );
 }
+
+export default forwardRef<StoryTreeHandle, StoryTreeProperties>(StoryTree);
