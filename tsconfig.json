@@ -1,15 +1,24 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES2020",
     "module": "ESNext",
-    "jsx": "react",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
     "strict": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
-    "forceConsistentCasingInFileNames": true,
-    "outDir": "./build",
-    "rootDir": "./packages/main"
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["packages/main"],
-  "exclude": ["node_modules"]
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

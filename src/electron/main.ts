@@ -2,8 +2,8 @@ import { BrowserWindow } from 'electron';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
-// import ConfigurationManager from './config.js';
-// import { NewProjectConfigurationChannel } from './preload.js';
+import ConfigurationManager from './config.js';
+// import { NewProjectConfigurationChannel } from '../preload/preload.js';
 import { config } from 'process';
 
 const __filename = fileURLToPath(import.meta.url);

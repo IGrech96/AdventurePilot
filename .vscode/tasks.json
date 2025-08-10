@@ -8,8 +8,14 @@
       "type": "shell",
       "command": "yarn dev",
       "options": {
-        "cwd": "${workspaceFolder}/packages/frontend"
+        "cwd": "${workspaceFolder}/src/renderer"
       },
+    },
+    {
+      "label": "yarn: compile",
+      "type": "shell",
+      "command": "yarn run build",
+      "problemMatcher": []
     }
   ]
 }

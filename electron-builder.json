@@ -1,0 +1,12 @@
+{
+  "appId": "com.example.myapp",
+  "productName": "MyApp",
+  "directories": {
+    "output": "dist"
+  },
+  "files": [
+    "dist/**/*",
+    "node_modules/**/*",
+    "package.json"
+  ]
+}

@@ -2,72 +2,41 @@
   "version": "0.2.0",
   "compounds": [
     {
-      "name": "Full Dev (Electron + Vite)",
+      "name": "Electron: All",
       "configurations": [
-        "Vite Dev Server",
-        "Compile Electron Main",
-        "Debug Electron Main",
-        "Debug Vite + React"
+        "Electron: Main",
+        "Electron: Renderer"
       ]
     }
   ],
   "configurations": [
     {
-      "name": "Vite Dev Server",
-      "type": "node",
-      "request": "launch",
-      "cwd": "${workspaceFolder}/packages/frontend",
-      "runtimeExecutable": "yarn",
-      "args": [
-        "dev"
-      ],
-      "console": "integratedTerminal",
-      "skipFiles": [
-        "<node_internals>/**"
-      ]
-    },
-    {
-      "name": "Compile Electron Main",
+      "name": "Electron: Main",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "yarn run",
-      "args": [
-        "build"
-      ],
-      "console": "integratedTerminal",
-      "skipFiles": [
-        "<node_internals>/**"
-      ]
-    },
-    {
-      "name": "Debug Electron Main",
-      "type": "node",
-      "request": "launch",
-      "program": "${workspaceFolder}/build/app.js",
-      "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "electron",
-      "windows": {
-        "runtimeExecutable": "${workspaceFolder}/node_modules/electron/dist/electron.exe"
-      },
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
       "runtimeArgs": [
-        ".",
-        "--enable-logging",
-        "--remote-debugging-port=9222",
+        "--remote-debugging-port=9223"
       ],
-      "args": [],
+      "args": [
+        "."
+      ],
       "outputCapture": "std",
-      "skipFiles": [
-        "<node_internals>/**"
-      ]
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ],
+      "preLaunchTask": "yarn: compile"
     },
     {
-      "name": "Debug Vite + React",
+      "name": "Electron: Renderer",
       "type": "chrome",
       "request": "attach",
-      "url": "http://localhost:3000",
-      "webRoot": "${workspaceFolder}/packages/frontend/src",
-      "port": 9222,
+      "port": 9223,
+      "webRoot": "${workspaceFolder}",
+      "timeout": 30000
     }
   ]
 }
