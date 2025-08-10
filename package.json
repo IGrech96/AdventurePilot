@@ -9,7 +9,7 @@
   "private": false,
   "type": "module",
   "scripts": {
-   "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
@@ -26,7 +26,6 @@
     "webpack": "^5.101.0"
   },
   "dependencies": {
-    "@types/electron": "^1.6.12",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "electron": "^37.2.6",

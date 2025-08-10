@@ -23,8 +23,8 @@ export default class Main {
 
     private static onReady() {
         Main.mainWindow = new BrowserWindow({ width: 800, height: 600 });
-        Main.mainWindow.loadFile('../frontend/dist/index.html')
-        // Main.mainWindow.loadURL('http://localhost:3000')
+        // Main.mainWindow.loadFile('../frontend/dist/index.html')
+        Main.mainWindow.loadURL('http://localhost:3000')
         Main.mainWindow.on('closed', Main.onClose);
     }
 
