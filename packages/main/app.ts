@@ -1,4 +1,4 @@
 import { app, BrowserWindow } from 'electron';
 import Main from './main.js';
 
-Main.main(app, BrowserWindow);
+const main = new Main(app, BrowserWindow);

@@ -1,41 +1,62 @@
 import { BrowserWindow } from 'electron';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import path from 'path';
+// import ConfigurationManager from './config.js';
+// import { NewProjectConfigurationChannel } from './preload.js';
+import { config } from 'process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default class Main {
 
-    static mainWindow: Electron.BrowserWindow | null;
-    static application: Electron.App;
-    static BrowserWindow: typeof BrowserWindow;
-    private static onWindowAllClosed() {
+    private mainWindow: BrowserWindow | null = null;
+    constructor(
+        private application: Electron.App,
+        private browserWindow: typeof Electron.BrowserWindow
+    ) {
+        application.on('window-all-closed', this.onWindowAllClosed.bind(this));
+        application.on('ready', this.onReady.bind(this));
+    }
+
+    private onWindowAllClosed = () => {
         if (process.platform !== 'darwin') {
-            Main.application.quit();
+            this.application.quit();
         }
     }
 
-    private static onClose() {
-        // Dereference the window object. 
-        Main.mainWindow = null;
-    }
+    // private onClose =() => {
+    //     // Dereference the window object. 
+    //     // this.mainWindow = null;
+    // }
 
-    private static onReady() {
-        Main.mainWindow = new BrowserWindow({ width: 800, height: 600 });
-        // Main.mainWindow.loadFile('../frontend/dist/index.html')
-        Main.mainWindow.loadURL('http://localhost:3000')
-        Main.mainWindow.on('closed', Main.onClose);
-    }
+    private onReady() {
+        this.mainWindow = new BrowserWindow(
+            {
+                width: 800,
+                height: 600,
+                // webPreferences: {
+                //     preload: path.join(__dirname, '../../build/preload.js'),
+                //     contextIsolation: true
+                // }
+            });
+        // this.mainWindow.loadFile('../frontend/dist/index.html')
+        this.mainWindow.loadURL('http://localhost:3000')
+        // this.mainWindow.on('closed', this.onClose);
 
-    static main(app: Electron.App, browserWindow: typeof BrowserWindow) {
-        // we pass the Electron.App object and the  
-        // Electron.BrowserWindow into this function 
-        // so this class has no dependencies. This 
-        // makes the code easier to write tests for 
-        Main.BrowserWindow = browserWindow;
-        Main.application = app;
-        Main.application.on('window-all-closed', Main.onWindowAllClosed);
-        Main.application.on('ready', Main.onReady);
+
+        // const projectFolder = "C:\\Users\\ivang\\source\\repos\\dnd\\stories\\sukkubinquitepool"
+
+        // const manager = new ConfigurationManager(projectFolder);
+
+        // const config = manager.TryReadProjectConfiguration();
+
+        // const mainWindow = this.mainWindow;
+        // mainWindow.webContents.on('did-finish-load', () => {
+        //     if (config) {
+        //         mainWindow.webContents.send(NewProjectConfigurationChannel, config);
+        //     }
+        // });
     }
 }
