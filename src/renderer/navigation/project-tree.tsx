@@ -13,8 +13,35 @@ type StoryTreeProperties = {
 
 export type StoryTreeHandle = {
 
-  doSomething: () => void;
+  createNew: () => void;
 }
+
+const initialItems: TreeViewBaseItem[] = [
+    {
+      id: "0", label: "Root", children: [
+        { id: "1", label: "Unread" },
+        { id: "2", label: "Threads" },
+        {
+          id: "3",
+          label: "Chat Rooms",
+          children: [
+            { id: "c1", label: "General" },
+            { id: "c2", label: "Random" },
+            { id: "c3", label: "Open Source Projects" },
+          ],
+        },
+        {
+          id: "4",
+          label: "Direct Messages",
+          children: [
+            { id: "d1", label: "Alice" },
+            { id: "d2", label: "Bob" },
+            { id: "d3", label: "Charlie" },
+          ],
+        },
+      ]
+    }
+  ];
 
 function findPositionInParent(collection: TreeViewBaseItem[], id: string | undefined): [TreeViewBaseItem, number] {
 
@@ -38,12 +65,12 @@ function findPositionInParent(collection: TreeViewBaseItem[], id: string | undef
   return recursiveSearch(collection[0])!
 }
 
-function StoryTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHandle>) {
+function ProjectTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHandle>) {
   const [selectedItem, setSelectedItem] = React.useState<string>();
   const apiRef = useTreeViewApiRef();
 
   useImperativeHandle(ref, () => ({
-    doSomething() {
+    createNew() {
       if (selectedItem) {
         const reordered = [...items];
 
@@ -82,34 +109,6 @@ function StoryTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHand
     },
   }));
 
-
-  const initialItems: TreeViewBaseItem[] = [
-    {
-      id: "0", label: "Root", children: [
-        { id: "1", label: "Unread" },
-        { id: "2", label: "Threads" },
-        {
-          id: "3",
-          label: "Chat Rooms",
-          children: [
-            { id: "c1", label: "General" },
-            { id: "c2", label: "Random" },
-            { id: "c3", label: "Open Source Projects" },
-          ],
-        },
-        {
-          id: "4",
-          label: "Direct Messages",
-          children: [
-            { id: "d1", label: "Alice" },
-            { id: "d2", label: "Bob" },
-            { id: "d3", label: "Charlie" },
-          ],
-        },
-      ]
-    }
-  ];
-
   const [items, setItems] = React.useState<TreeViewBaseItem[]>(initialItems);
   const dragItem = React.useRef<TreeItemProps | null>(null);
 
@@ -119,8 +118,6 @@ function StoryTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHand
     // event.preventDefault();
     event.stopPropagation();
   };
-
-
 
   const handleDrop = (event: React.DragEvent<HTMLElement>, props: TreeItemProps, position: "on" | "before" | "after") => {
     event.currentTarget.classList.remove('drag-over');
@@ -273,7 +270,7 @@ function StoryTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHand
   });
 
   return (
-    <Box sx={{ height: 400, overflow: 'auto' }}>
+    <Box sx={{ overflow: 'auto' }}>
       <RichTreeView
         apiRef={apiRef}
         items={items}
@@ -285,4 +282,4 @@ function StoryTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHand
   );
 }
 
-export default forwardRef<StoryTreeHandle, StoryTreeProperties>(StoryTree);
+export default forwardRef<StoryTreeHandle, StoryTreeProperties>(ProjectTree);
