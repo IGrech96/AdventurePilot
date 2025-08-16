@@ -9,4 +9,9 @@ export default defineConfig({
   server: {
     port: 3000, // Electron будет загружать этот порт
   },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src/renderer/tiptap'),
+    },
+  },
 })

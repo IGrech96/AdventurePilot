@@ -1,0 +1,13 @@
+.simple-editor-content {
+  height: 100%;
+  width: 100%;
+}
+
+.simple-editor-wrapper {
+  height: 100%;
+  width: 100%;
+}
+
+.tiptap-toolbar[data-variant=fixed] {
+  padding: 0;
+}
