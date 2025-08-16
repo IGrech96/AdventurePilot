@@ -1,6 +1,6 @@
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
 import { useTreeViewApiRef } from '@mui/x-tree-view';
-import type { TreeViewBaseItem } from '@mui/x-tree-view/models';
+import type { TreeViewBaseItem, TreeViewDefaultItemModelProperties } from '@mui/x-tree-view/models';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import type { TreeItemProps } from '@mui/x-tree-view/TreeItem';
 import { Box } from '@mui/material';
@@ -16,36 +16,51 @@ export type StoryTreeHandle = {
   createNew: () => void;
 }
 
-const initialItems: TreeViewBaseItem[] = [
+type dragndropposition = "before" | "on" | "after";
+type nodetype = "reserved" | "scene";
+
+const initialItems: ProjectTreeViewItem[] = toTree(null);
+
+export type ProjectTreeViewItem<R extends {} = TreeViewDefaultItemModelProperties> = R & {
+  children?: ProjectTreeViewItem<R>[];
+  path?: string;
+  type: nodetype;
+};
+
+function toTree(data: ProjectConfiguration | null): ProjectTreeViewItem[] {
+  let iterator = 0;
+  const extractLocations = (scenes: SceneDefinition[] | undefined | null):ProjectTreeViewItem[] =>{
+    if (!scenes) return [];
+    const data: ProjectTreeViewItem[] = scenes.map(x => ({
+      id: (iterator++).toString(),
+      label: x.name,
+      type: 'scene',
+      path: x.file,
+      children: extractLocations(x.scenes)
+    }));
+
+    return data;
+  }
+  return [
     {
-      id: "0", label: "Root", children: [
-        { id: "1", label: "Unread" },
-        { id: "2", label: "Threads" },
-        {
-          id: "3",
-          label: "Chat Rooms",
-          children: [
-            { id: "c1", label: "General" },
-            { id: "c2", label: "Random" },
-            { id: "c3", label: "Open Source Projects" },
-          ],
-        },
-        {
-          id: "4",
-          label: "Direct Messages",
-          children: [
-            { id: "d1", label: "Alice" },
-            { id: "d2", label: "Bob" },
-            { id: "d3", label: "Charlie" },
-          ],
-        },
+      id: (iterator++).toString(), label: data?.name ?? "Adventure" , type: 'reserved', children: [
+        { id: (iterator++).toString(), label: "Overview", type: 'reserved', path: data?.overview },
+        { id: (iterator++).toString(), label: "Locations", type: 'reserved', children: extractLocations(data?.scenes)  },
       ]
     }
-  ];
+  ]
+}
 
-function findPositionInParent(collection: TreeViewBaseItem[], id: string | undefined): [TreeViewBaseItem, number] {
+function findNode(collection: ProjectTreeViewItem[], id: string) : ProjectTreeViewItem{
+  if (id == "0") return collection[0];
 
-  const recursiveSearch = (currentParent: TreeViewBaseItem): [TreeViewBaseItem, number] | null => {
+  const [parent, index] = findPositionInParent(collection, id)!;
+  return parent.children![index];
+}
+
+function findPositionInParent(collection: ProjectTreeViewItem[], id: string | undefined): [ProjectTreeViewItem, number] {
+
+  const recursiveSearch = (currentParent: ProjectTreeViewItem): [ProjectTreeViewItem, number] | null => {
     if (currentParent.children) {
       for (let index = 0; index < currentParent.children.length; index++) {
         const element = currentParent.children[index];
@@ -71,47 +86,51 @@ function ProjectTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHa
 
   useImperativeHandle(ref, () => ({
     createNew() {
-      if (selectedItem) {
-        const reordered = [...items];
+      //TODO:
+      // if (selectedItem) {
+      //   const reordered = [...items];
 
-        const next = {
-          id: "7",
-          label: "New ",
-        }
+      //   const next = {
+      //     id: "7",
+      //     label: "New ",
+      //   }
 
-        if (selectedItem !== "0") {
-          const [parent, index] = findPositionInParent(reordered, selectedItem);
-          parent.children![index].children ??= [];
-          parent.children![index].children.push(next)
+      //   if (selectedItem !== "0") {
+      //     const [parent, index] = findPositionInParent(reordered, selectedItem);
+      //     parent.children![index].children ??= [];
+      //     parent.children![index].children.push(next)
 
-          apiRef.current?.setItemExpansion({
-            itemId: parent.children![index].id,
-            shouldBeExpanded: true
-          });
+      //     apiRef.current?.setItemExpansion({
+      //       itemId: parent.children![index].id,
+      //       shouldBeExpanded: true
+      //     });
 
-        }
-        else {
-          reordered[0].children ??= [];
-          reordered[0].children.push(next);
-          apiRef.current?.setItemExpansion({
-            itemId: reordered[0].id,
-            shouldBeExpanded: true
-          });
-        }
+      //   }
+      //   else {
+      //     reordered[0].children ??= [];
+      //     reordered[0].children.push(next);
+      //     apiRef.current?.setItemExpansion({
+      //       itemId: reordered[0].id,
+      //       shouldBeExpanded: true
+      //     });
+      //   }
 
-        setItems(reordered);
-        apiRef.current?.setItemSelection({
-          itemId: next.id,
-          shouldBeSelected: true,
-          keepExistingSelection: false
-        })
-      }
+      //   setItems(reordered);
+      //   apiRef.current?.setItemSelection({
+      //     itemId: next.id,
+      //     shouldBeSelected: true,
+      //     keepExistingSelection: false
+      //   })
+      // }
     },
   }));
 
-  const [items, setItems] = React.useState<TreeViewBaseItem[]>(initialItems);
+  const [items, setItems] = React.useState<ProjectTreeViewItem[]>(initialItems);
   const dragItem = React.useRef<TreeItemProps | null>(null);
 
+  window.applicationAPI.onProjectOpen((data: ProjectConfiguration) => {
+    setItems(toTree(data));
+  });
 
   const handleDragStart = (event: React.DragEvent<HTMLLIElement>, props: TreeItemProps) => {
     dragItem.current = props;
@@ -119,7 +138,7 @@ function ProjectTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHa
     event.stopPropagation();
   };
 
-  const handleDrop = (event: React.DragEvent<HTMLElement>, props: TreeItemProps, position: "on" | "before" | "after") => {
+  const handleDrop = (event: React.DragEvent<HTMLElement>, props: TreeItemProps, position: dragndropposition) => {
     event.currentTarget.classList.remove('drag-over');
 
     const draggedProps = dragItem.current;
@@ -164,7 +183,7 @@ function ProjectTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHa
   const handleDragOver = (
     event: React.DragEvent<HTMLElement>,
     props: TreeItemProps,
-    position: "on" | "before" | "after") => {
+    position: dragndropposition) => {
     event.preventDefault();
     event.stopPropagation();
     // console.log(position + " " + props.label)
@@ -190,7 +209,7 @@ function ProjectTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHa
       setSelectedItem(id);
   };
 
-  const IndentedDiv = ({ treeItemRef, props, position }: { treeItemRef: React.RefObject<HTMLLIElement | null>, props: TreeItemProps, position: "on" | "before" | "after" }) => {
+  const IndentedDiv = ({ treeItemRef, props, position }: { treeItemRef: React.RefObject<HTMLLIElement | null>, props: TreeItemProps, position: dragndropposition }) => {
     const divRef = useRef<HTMLDivElement>(null);
     const [marginLeft, setMarginLeft] = useState<string>('0px');
 
@@ -222,7 +241,9 @@ function ProjectTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHa
     ref: React.Ref<HTMLLIElement>,
   ) {
     const treeItemRef = useRef<HTMLLIElement>(null);
-    const canDrag = props.itemId != "0";
+    const node = props.itemId ? findNode(items, props.itemId) : null;
+    const canDrag = node != null && node.type != 'reserved';
+    props.itemId != "0";
     if (!canDrag) {
       return (
         <TreeItem

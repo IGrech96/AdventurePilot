@@ -15,7 +15,14 @@
       "label": "yarn: compile",
       "type": "shell",
       "command": "yarn run build",
-      "problemMatcher": []
+      "problemMatcher": [],
+      "dependsOn": ["copy appApi.js"]
+    },
+    {
+      "label": "copy appApi.js",
+      "type": "shell",
+      "command": "cp ${workspaceFolder}/src/electron/appApi.js ${workspaceFolder}/dist/electron",
+      "problemMatcher": [],
     }
   ]
 }

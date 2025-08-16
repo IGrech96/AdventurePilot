@@ -5,8 +5,9 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
     "outDir": "dist/renderer",
     "rootDir": "src/renderer"
   },
-  "include": ["./src/renderer"]
+  "include": ["./src/renderer",  "src/renderer/appApi.d.ts"]
 }

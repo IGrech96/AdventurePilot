@@ -4,6 +4,7 @@ import { dirname } from 'path';
 import path from 'path';
 import ConfigurationManager from './config.js';
 import { config } from 'process';
+import { OpenProjectChannel } from './config.js';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -55,7 +56,7 @@ export default class Main {
         const mainWindow = this.mainWindow;
         mainWindow.webContents.on('did-finish-load', () => {
             if (config) {
-                mainWindow.webContents.send('OpenProjectChannel', config);
+                mainWindow.webContents.send(OpenProjectChannel, config);
             }
         });
     }

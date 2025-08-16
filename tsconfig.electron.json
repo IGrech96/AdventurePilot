@@ -4,8 +4,9 @@
     "composite": true,
     "module": "nodenext",
     "moduleResolution": "nodenext",
+    "sourceMap": true,
     "outDir": "dist/electron",
     "rootDir": "src/electron"
   },
-  "include": ["src/electron/**/*.ts"]
+  "include": ["src/electron/**/*.ts", "src/electron/appApi.js"]
 }
