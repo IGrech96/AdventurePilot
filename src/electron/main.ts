@@ -3,11 +3,11 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
 import ConfigurationManager from './config.js';
-// import { NewProjectConfigurationChannel } from '../preload/preload.js';
 import { config } from 'process';
 
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = dirname(__filename);
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export default class Main {
 
@@ -36,27 +36,27 @@ export default class Main {
             {
                 width: 800,
                 height: 600,
-                // webPreferences: {
-                //     preload: path.join(__dirname, '../../build/preload.js'),
-                //     contextIsolation: true
-                // }
+                webPreferences: {
+                    preload: path.join(__dirname, './appApi.js'),
+                    contextIsolation: true
+                }
             });
         // this.mainWindow.loadFile('../frontend/dist/index.html')
         this.mainWindow.loadURL('http://localhost:3000')
         // this.mainWindow.on('closed', this.onClose);
 
 
-        // const projectFolder = "C:\\Users\\ivang\\source\\repos\\dnd\\stories\\sukkubinquitepool"
+        const projectFolder = "C:\\Users\\ivang\\source\\repos\\dnd\\stories\\sukkubinquitepool"
 
-        // const manager = new ConfigurationManager(projectFolder);
+        const manager = new ConfigurationManager();
 
-        // const config = manager.TryReadProjectConfiguration();
+        const config = manager.TryReadProjectConfigurationFolder(projectFolder);
 
-        // const mainWindow = this.mainWindow;
-        // mainWindow.webContents.on('did-finish-load', () => {
-        //     if (config) {
-        //         mainWindow.webContents.send(NewProjectConfigurationChannel, config);
-        //     }
-        // });
+        const mainWindow = this.mainWindow;
+        mainWindow.webContents.on('did-finish-load', () => {
+            if (config) {
+                mainWindow.webContents.send('OpenProjectChannel', config);
+            }
+        });
     }
 }
