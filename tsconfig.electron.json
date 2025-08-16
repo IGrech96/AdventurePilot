@@ -2,10 +2,10 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "composite": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "outDir": "dist/electron",
     "rootDir": "src/electron"
   },
-  "include": [
-    "src/electron/**/*"
-  ]
+  "include": ["src/electron/**/*.ts"]
 }

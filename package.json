@@ -13,7 +13,7 @@
     "dev:react": "vite",
     "dev:electron": "npm run transpile:electron && cross-env NODE_ENV=development electron .",
     "build": "tsc -b && vite build",
-    "transpile:electron": "tsc --project ./tsconfig.node.json",
+    "transpile:electron": "tsc --project ./tsconfig.electron.json",
     "dist:win": "electron-builder --win --x64",
     "dist:mac": "electron-builder --mac --arm64",
     "dist:linux": "electron-builder --linux --x64"

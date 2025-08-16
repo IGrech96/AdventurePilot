@@ -2,10 +2,11 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "composite": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
     "outDir": "dist/renderer",
     "rootDir": "src/renderer"
   },
-  "include": [
-    "src/renderer/**/*"
-  ]
+  "include": ["./src/renderer"]
 }

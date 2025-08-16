@@ -6,8 +6,8 @@ import ConfigurationManager from './config.js';
 // import { NewProjectConfigurationChannel } from '../preload/preload.js';
 import { config } from 'process';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = dirname(__filename);
 
 export default class Main {
 
