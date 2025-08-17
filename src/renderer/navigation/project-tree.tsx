@@ -6,6 +6,7 @@ import type { TreeItemProps } from '@mui/x-tree-view/TreeItem';
 import { Box } from '@mui/material';
 import * as React from 'react';
 import { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
+import { findNode, findPositionInParent, ProjectTreeViewItem, toTree } from './project-tree-item';
 
 type StoryTreeProperties = {
 
@@ -17,68 +18,8 @@ export type StoryTreeHandle = {
 }
 
 type dragndropposition = "before" | "on" | "after";
-type nodetype = "reserved" | "scene";
 
 const initialItems: ProjectTreeViewItem[] = toTree(null);
-
-export type ProjectTreeViewItem<R extends {} = TreeViewDefaultItemModelProperties> = R & {
-  children?: ProjectTreeViewItem<R>[];
-  path?: string;
-  type: nodetype;
-};
-
-function toTree(data: ProjectConfiguration | null): ProjectTreeViewItem[] {
-  let iterator = 0;
-  const extractLocations = (scenes: SceneDefinition[] | undefined | null):ProjectTreeViewItem[] =>{
-    if (!scenes) return [];
-    const data: ProjectTreeViewItem[] = scenes.map(x => ({
-      id: (iterator++).toString(),
-      label: x.name,
-      type: 'scene',
-      path: x.file,
-      children: extractLocations(x.scenes)
-    }));
-
-    return data;
-  }
-  return [
-    {
-      id: (iterator++).toString(), label: data?.name ?? "Adventure" , type: 'reserved', children: [
-        { id: (iterator++).toString(), label: "Overview", type: 'reserved', path: data?.overview },
-        { id: (iterator++).toString(), label: "Locations", type: 'reserved', children: extractLocations(data?.scenes)  },
-      ]
-    }
-  ]
-}
-
-function findNode(collection: ProjectTreeViewItem[], id: string) : ProjectTreeViewItem{
-  if (id == "0") return collection[0];
-
-  const [parent, index] = findPositionInParent(collection, id)!;
-  return parent.children![index];
-}
-
-function findPositionInParent(collection: ProjectTreeViewItem[], id: string | undefined): [ProjectTreeViewItem, number] {
-
-  const recursiveSearch = (currentParent: ProjectTreeViewItem): [ProjectTreeViewItem, number] | null => {
-    if (currentParent.children) {
-      for (let index = 0; index < currentParent.children.length; index++) {
-        const element = currentParent.children[index];
-        if (element.id === id) {
-          return [currentParent, index]
-        }
-
-        const fromChild = recursiveSearch(element);
-        if (fromChild) {
-          return fromChild
-        }
-      }
-    }
-    return null;
-  }
-
-  return recursiveSearch(collection[0])!
-}
 
 function ProjectTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHandle>) {
   const [selectedItem, setSelectedItem] = React.useState<string>();
@@ -128,9 +69,18 @@ function ProjectTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHa
   const [items, setItems] = React.useState<ProjectTreeViewItem[]>(initialItems);
   const dragItem = React.useRef<TreeItemProps | null>(null);
 
-  window.applicationAPI.onProjectOpen((data: ProjectConfiguration) => {
-    setItems(toTree(data));
-  });
+
+
+  useEffect(() => {
+    const onProjectOpen = (event: any, data: ProjectConfiguration) => {
+      setItems(toTree(data));
+    }
+    window.applicationApi.project.subscribe_onProjectOpen(onProjectOpen);
+
+    return () => {
+      window.applicationApi.project.unsubscribe_onProjectOpen(onProjectOpen);
+    }
+  }, []);
 
   const handleDragStart = (event: React.DragEvent<HTMLLIElement>, props: TreeItemProps) => {
     dragItem.current = props;
@@ -208,6 +158,15 @@ function ProjectTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHa
     if (id)
       setSelectedItem(id);
   };
+
+  const handleItemClicked = (vent: React.MouseEvent, itemId: string) => {
+    const node = findNode(items, itemId);
+    if (node.type == 'overview' || node.type == 'scene') {
+      if (node.path && node.source) {
+        window.applicationApi.file.invokeOpenMarkdown(node.path, node.source);
+      }
+    }
+  }
 
   const IndentedDiv = ({ treeItemRef, props, position }: { treeItemRef: React.RefObject<HTMLLIElement | null>, props: TreeItemProps, position: dragndropposition }) => {
     const divRef = useRef<HTMLDivElement>(null);
@@ -297,6 +256,7 @@ function ProjectTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHa
         items={items}
         slots={{ item: CustomTreeItem }}
         selectedItems={selectedItem}
+        onItemClick={handleItemClicked}
         onSelectedItemsChange={handleSelectedItemsChange}
       />
     </Box>

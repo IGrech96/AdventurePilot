@@ -21,7 +21,7 @@
     {
       "label": "copy appApi.js",
       "type": "shell",
-      "command": "cp ${workspaceFolder}/src/electron/appApi.js ${workspaceFolder}/dist/electron",
+      "command": "cp ${workspaceFolder}/src/electron/appApi.preload.js ${workspaceFolder}/dist/electron",
       "problemMatcher": [],
     }
   ]

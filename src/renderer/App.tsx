@@ -3,8 +3,22 @@ import Navigator from './navigation/navigator'
 import Split from 'react-split';
 import { Box, Paper, Typography } from '@mui/material';
 import MarkdownEditor from './editor/markdown-editor';
+import { useEffect, useState } from 'react';
 
 function App() {
+  const [activeMarkdown, setActiveMarkdown] = useState("");
+
+  const onMarkdownOpen = (event: any, content: string) => {
+    setActiveMarkdown(content);
+  };
+
+  useEffect(() => {
+    window.applicationApi.file.subscribe_onMarkdownOpen(onMarkdownOpen);
+
+    return () => {
+      window.applicationApi.file.unsubscribe_onMarkdownOpen(onMarkdownOpen);
+    }
+  }, [onMarkdownOpen]);
 
   return (
     <>
@@ -21,7 +35,7 @@ function App() {
 
         {/* Right Pane: Working Area */}
         <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
-          <MarkdownEditor />
+          <MarkdownEditor plainText={activeMarkdown} />
           {/* Your main content goes here */}
         </Box>
       </Split>

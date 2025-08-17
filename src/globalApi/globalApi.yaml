@@ -1,0 +1,29 @@
+api:
+  applicationApi:
+    project:
+      onProjectOpen:
+        channel: 'project-opened'
+        args: 
+        - data: ProjectConfiguration
+    file:
+      invokeOpenMarkdown:
+        channel: 'open-markdown'
+        args:
+        - filePath: string
+        - node: SceneDefinition | OverviewDefinition
+      onMarkdownOpen:
+        channel: 'markdown-opened'
+        args:
+        - content: string
+
+models:
+  ProjectConfiguration:
+    overview: OverviewDefinition
+    scenes: SceneDefinition[]
+  SceneDefinition:
+    name: string
+    file: string
+    scenes: SceneDefinition[]
+  OverviewDefinition:
+    name: string
+    file: string

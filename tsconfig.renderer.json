@@ -9,8 +9,15 @@
     "outDir": "dist/renderer",
     "rootDir": "src/renderer",
     "paths": {
-      "@/*": ["./src/renderer/tiptap/*"]
+      "@/*": [
+        "./src/renderer/tiptap/*"
+      ]
     }
   },
-  "include": ["./src/renderer",  "src/renderer/appApi.d.ts", "./src/renderer/tiptap/components/tiptap-templates/simple/data/content.json"]
+  "include": [
+    "./src/renderer",
+    "src/renderer/appApi.d.ts",
+    "./src/renderer/tiptap/components/tiptap-templates/simple/data/content.json",
+    "./src/renderer/tiptap/components/tiptap-templates/simple/data/content2.json",
+  ]
 }

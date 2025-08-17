@@ -1,0 +1,280 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 1
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Болото"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Предистория"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "После нескольких дней странствия, Вы решили наконец-то зайти в поселение, пополнить запасы, отдохнуть, может быть даже выпить водки:"
+        }
+      ]
+    },
+    {
+      "type": "blockquote",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Ржаной водки я бы выпил. Такой, знаешь, холодной, прямо из погребка.\r\n--  Весимир"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "По карте Вы обнаружили ближайшую деревушку #key(anchor: <silver_forest>)[Серебряный лес] и хоть чуть дальше за деревушкой\r\nнаходится город #key(anchor: "
+        },
+        {
+          "type": "text",
+          "text": "<grimshold>"
+        },
+        {
+          "type": "text",
+          "text": ")[Гримсхольд],  вы все же решаете первым делом остановится в деревне.\r\nИ будучи почти у самой цели, Вы слышите с #key(anchor: "
+        },
+        {
+          "type": "text",
+          "text": "<swamp>"
+        },
+        {
+          "type": "text",
+          "text": ")[болот] крик о помощи."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Начало"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Подойдя к болоту, Вы видите как по колено в трясине стоит уже не молодой мужчина, в порванной и окрававленной рубахе, с небольшим мечом, а его "
+        },
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "code"
+            }
+          ],
+          "text": "окружает"
+        },
+        {
+          "type": "text",
+          "text": " толпа #key[Утопцев]. "
+        },
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "italic"
+            }
+          ],
+          "text": "Кол = Кол игроков + 2",
+          "content": [
+            {
+              "type": "text",
+              "text": "Кол = Кол игроков + 2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "bold"
+            }
+          ],
+          "text": "Завязка",
+          "content": [
+            {
+              "type": "text",
+              "text": "Завязка"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": {
+        "language": null
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Это в болоте оказался \r\nбывший королевский Алхимик, #key[Рудольф Клейн], он пытался собрать цветок, нужный для производства Фисштеха. \r\n(Игрокам он об этом не рассказывает)"
+        },
+        {
+          "type": "text"
+        },
+        {
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "#image(\"images/swamp.jpg\")\r\n#default_bestiary.drowns()\r\n#rudolf()"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "#breakoutbox(\"Развязка\")["
+        }
+      ]
+    },
+    {
+      "type": "bulletList",
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "#text[Игроки спасают #key[Рудольф Клейна] (особенно если среди игроков есть Ведьмак)\r\nон благодарит игроков и предлагает отправиться с ним в #key(anchor: <silver_forest_taverna>)[местныую таверну],\r\nгде он даст за свое спасение #key[10 крон]. По пути #key[Рудольф] говорит:]\r\n#quote[Я Вам оень благодарен, наверное сама судьба свела нас сегодня.\r\nЯ и мои друзья, как раз ищем Ведьмака ("
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "italic"
+                    }
+                  ],
+                  "text": "или рыцарей",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "или рыцарей"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": ").\r\nПойдем скорее в #key(anchor: <silver_forest_taverna>)[Таверну],\r\nэто дело надо отметить! + с меня #key[10 крон] ну и работу можем Вам предложить.]"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "#text[Игроки не спасают #key[Рудольф Клейна], но когда утопцы уходят - осматривают его труп.\r\n#label(\"rudolf_rip\")\r\n#table(\r\ncolumns: (15%, 85%),\r\n[Результат Внимания],[Опсание],\r\n[0-9],[Труп Рудольфа, а рядом труп утопца],\r\n[10-19],[У Рудольфа отгрызен палец, а пасть утопца в крови. #skill_check(\"Монстрология\", \"Инт\", 10) - в утопце можно найти золотой перстень с печаткой #key[Рудольфа]],\r\n[20+],[Рядом можно найти разбросанные бутоны необычных цветов, #skill_check(\"Алхимия\", \"Инт\", 20) чаще всего их применяют для производства Фисштеха],\r\n)"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "]"
+        }
+      ]
+    },
+    {
+      "type": "bulletList",
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Игроки просто игнорят событие."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "В дальнейщем игроки могут прийти в #key(anchor: <silver_forest>)[деревню Серебрянный лес]."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "]"
+        }
+      ]
+    }
+  ]
+}

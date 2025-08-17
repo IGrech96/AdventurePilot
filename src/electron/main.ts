@@ -1,10 +1,10 @@
-import { BrowserWindow } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
+import fs from 'fs';
 import ConfigurationManager from './config.js';
-import { config } from 'process';
-import { OpenProjectChannel } from './config.js';
+import { applicationApi, OverviewDefinition, SceneDefinition } from './appApi.js';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -38,7 +38,7 @@ export default class Main {
                 width: 800,
                 height: 600,
                 webPreferences: {
-                    preload: path.join(__dirname, './appApi.js'),
+                    preload: path.join(__dirname, './appApi.preload.js'),
                     contextIsolation: true
                 }
             });
@@ -54,10 +54,22 @@ export default class Main {
         const config = manager.TryReadProjectConfigurationFolder(projectFolder);
 
         const mainWindow = this.mainWindow;
+
+        const api: applicationApi = new applicationApi(mainWindow);
+
         mainWindow.webContents.on('did-finish-load', () => {
             if (config) {
-                mainWindow.webContents.send(OpenProjectChannel, config);
+                api.project.onProjectOpen(config);
             }
+        });
+
+        api.file.invokeOpenMarkdown((event: any, filepath: string, node: SceneDefinition | OverviewDefinition) => {
+            let content = fs.readFileSync(path.join(projectFolder, filepath), 'utf8');
+            if (!content)
+            {
+                content = ""
+            }
+            api.file.onMarkdownOpen(content);
         });
     }
 }

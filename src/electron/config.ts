@@ -1,21 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
-
-export const OpenProjectChannel = "OpenProject";
-
-export interface ProjectConfiguration {
-    name?: string;
-    overview: string;
-    scenes: SceneDefinition[];
-}
-
-export interface SceneDefinition {
-    name: string;
-    file: string;
-
-    scenes: SceneDefinition[] | null;
-}
+import { ProjectConfiguration } from './appApi.js';
 
 export default class ConfigurationManager {
 
@@ -24,8 +10,17 @@ export default class ConfigurationManager {
             const mainConfig = projectFile;
             const fileContents = fs.readFileSync(mainConfig, 'utf8');
             const data = yaml.load(fileContents) as ProjectConfiguration;
-            if (!data.name){
-                data.name = path.basename(path.dirname(projectFile));
+
+            const defaultName = path.basename(path.dirname(projectFile));
+            if (!data.overview){
+                data.overview = {
+                    file: "",
+                    name: defaultName
+                };
+            }
+            if (!data.overview.name)
+            {
+                data.overview.name = defaultName;
             }
             return data;
         } catch (e) {

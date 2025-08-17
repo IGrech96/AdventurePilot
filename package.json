@@ -9,6 +9,7 @@
   "private": false,
   "type": "module",
   "scripts": {
+    "generate-ipc": "ts-node src/scripts/generate-api.ts --decl src/globalApi/globalApi.yaml",
     "dev": "npm-run-all --parallel dev:react dev:electron",
     "dev:react": "vite",
     "dev:electron": "npm run transpile:electron && cross-env NODE_ENV=development electron .",
@@ -40,6 +41,7 @@
     "standard": "^17.1.2",
     "standard-loader": "^7.0.0",
     "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
     "tslint": "^6.1.3",
     "tslint-config-standard": "^9.0.0",
     "tslint-loader": "^3.5.4",
@@ -83,6 +85,9 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hotkeys-hook": "^5.1.0",
-    "react-split": "^2.0.14"
+    "react-split": "^2.0.14",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
+    "unified": "^11.0.5"
   }
 }

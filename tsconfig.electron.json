@@ -8,5 +8,5 @@
     "outDir": "dist/electron",
     "rootDir": "src/electron"
   },
-  "include": ["src/electron/**/*.ts", "src/electron/appApi.js"]
+  "include": ["src/electron/**/*.ts", "src/electron/appApi.preload.js"]
 }
