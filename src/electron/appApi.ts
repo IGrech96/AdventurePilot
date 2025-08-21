@@ -13,8 +13,16 @@ export class applicationApi {
         invokeOpenMarkdown: (callback: (event: any, filePath: string, node: SceneDefinition | OverviewDefinition) => void) => {
             ipcMain.on('open-markdown', callback);
         },
-        onMarkdownOpen: (content: string) => {
-            this.window.webContents.send('markdown-opened', content);
+        onMarkdownOpen: (content: string, node: SceneDefinition | OverviewDefinition) => {
+            this.window.webContents.send('markdown-opened', content, node);
+        },
+        invokeSaveMarkdown: (callback: (event: any, content: string, node: SceneDefinition | OverviewDefinition) => void) => {
+            ipcMain.on('save-markdown', callback);
+        },
+    }
+    public application = {
+        onSaveRequest: () => {
+            this.window.webContents.send('save-requested', );
         },
     }
 }

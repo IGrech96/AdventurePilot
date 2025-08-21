@@ -9,8 +9,13 @@ declare global {
             },
             file: {
                 invokeOpenMarkdown: (filePath: string, node: SceneDefinition | OverviewDefinition) => void;
-                subscribe_onMarkdownOpen: (callback: (event: any, content: string) => void) => void;
-                unsubscribe_onMarkdownOpen: (callback: (event: any, content: string) => void) => void;
+                subscribe_onMarkdownOpen: (callback: (event: any, content: string, node: SceneDefinition | OverviewDefinition) => void) => void;
+                unsubscribe_onMarkdownOpen: (callback: (event: any, content: string, node: SceneDefinition | OverviewDefinition) => void) => void;
+                invokeSaveMarkdown: (content: string, node: SceneDefinition | OverviewDefinition) => void;
+            },
+            application: {
+                subscribe_onSaveRequest: (callback: (event: any, ) => void) => void;
+                unsubscribe_onSaveRequest: (callback: (event: any, ) => void) => void;
             },
         },
     }

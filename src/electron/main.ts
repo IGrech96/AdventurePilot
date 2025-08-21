@@ -11,7 +11,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default class Main {
-
     private mainWindow: BrowserWindow | null = null;
     constructor(
         private application: Electron.App,
@@ -65,11 +64,22 @@ export default class Main {
 
         api.file.invokeOpenMarkdown((event: any, filepath: string, node: SceneDefinition | OverviewDefinition) => {
             let content = fs.readFileSync(path.join(projectFolder, filepath), 'utf8');
-            if (!content)
-            {
+            if (!content) {
                 content = ""
             }
-            api.file.onMarkdownOpen(content);
+            api.file.onMarkdownOpen(content, node);
         });
+
+        api.file.invokeSaveMarkdown( (event:any, content: string, node: SceneDefinition | OverviewDefinition) => {
+            fs.writeFileSync(path.join(projectFolder, node.file), content, {
+                encoding: 'utf-8'
+            });
+        });
+    }
+
+    public Save(): void {
+        const api = new applicationApi(this.mainWindow!);
+
+        api.application.onSaveRequest();
     }
 }

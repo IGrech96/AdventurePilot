@@ -53,7 +53,9 @@ if (data && data.api) {
             methods.forEach(methodName => {
 
                 const isEvent = methodName.startsWith('on');
-                const args: any[] = Object.values(data.api[apiName][domainName][methodName].args)
+                const args: any[] = !!data.api[apiName][domainName][methodName].args
+                    ? Object.values(data.api[apiName][domainName][methodName].args)
+                    : [];
                 const channel = data.api[apiName][domainName][methodName].channel;
 
                 const argNames = args.map(x => Object.keys(x)[0]);

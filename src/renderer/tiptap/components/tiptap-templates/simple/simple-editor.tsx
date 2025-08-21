@@ -11,6 +11,7 @@ import { Highlight } from "@tiptap/extension-highlight"
 import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
 import { Selection } from "@tiptap/extensions"
+import { Markdown } from 'tiptap-markdown';
 
 // --- UI Primitives ---
 import { Button } from "@/components/tiptap-ui-primitive/button"
@@ -72,6 +73,7 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
 import "@/components/tiptap-templates/simple/simple-editor.scss"
 
 import content from "@/components/tiptap-templates/simple/data/content2.json"
+import { forwardRef, useImperativeHandle } from "react"
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -181,13 +183,29 @@ const MobileToolbarContent = ({
   </>
 )
 
-export function SimpleEditor({ jsonContent }: { jsonContent: JSONContent }) {
+type SimpleEditorProperties = {
+  jsonContent: JSONContent
+}
+
+export type SimpleEditorHandle = {
+  getContent: () => string | null;
+}
+
+function SimpleEditor(properties: SimpleEditorProperties, ref: React.Ref<SimpleEditorHandle>) {
   const isMobile = useIsMobile()
   const { height } = useWindowSize()
   const [mobileView, setMobileView] = React.useState<
     "main" | "highlighter" | "link"
   >("main")
   const toolbarRef = React.useRef<HTMLDivElement>(null)
+
+   useImperativeHandle(ref, () => ({
+      getContent: () => {
+       const storage = editor?.storage as any;
+       const data = storage?.markdown.getMarkdown();
+       return data as string;
+      }
+    }));
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -209,6 +227,7 @@ export function SimpleEditor({ jsonContent }: { jsonContent: JSONContent }) {
           enableClickSelection: true,
         },
       }),
+      Markdown,
       HorizontalRule,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       TaskList,
@@ -229,7 +248,7 @@ export function SimpleEditor({ jsonContent }: { jsonContent: JSONContent }) {
     ],
   })
 
-  editor?.commands.setContent(jsonContent);
+  editor?.commands.setContent(properties.jsonContent);
 
   const rect = useCursorVisibility({
     editor,
@@ -278,3 +297,5 @@ export function SimpleEditor({ jsonContent }: { jsonContent: JSONContent }) {
     </div>
   )
 }
+
+export default forwardRef<SimpleEditorHandle, SimpleEditorProperties>(SimpleEditor);

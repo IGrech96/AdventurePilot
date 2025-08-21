@@ -88,6 +88,7 @@
     "react-split": "^2.0.14",
     "remark-parse": "^11.0.0",
     "remark-stringify": "^11.0.0",
+    "tiptap-markdown": "^0.8.10",
     "unified": "^11.0.5"
   }
 }

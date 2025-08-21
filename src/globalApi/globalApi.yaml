@@ -15,6 +15,16 @@ api:
         channel: 'markdown-opened'
         args:
         - content: string
+        - node: SceneDefinition | OverviewDefinition
+      invokeSaveMarkdown:
+        channel: 'save-markdown'
+        args:
+        - content: string
+        - node: SceneDefinition | OverviewDefinition
+
+    application:
+      onSaveRequest:
+        channel: 'save-requested'
 
 models:
   ProjectConfiguration:

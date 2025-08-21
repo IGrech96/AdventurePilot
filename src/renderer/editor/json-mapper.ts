@@ -1,13 +1,5 @@
 import { JSONContent } from "@tiptap/core";
-
-
-// const renameNodeTypes: { source: string, target: string }[] = [
-//     { source: "root", target: "doc" },
-//     { source: "html", target: "text" },
-//     { source: "list", target: "bulletList" },
-//     { source: "emphasis", target: "bulletList" },
-// ]
-
+import type { Root } from 'mdast'
 
 const skip = (data: { sourceKey: string, transformedValue: any, targetNode: JSONContent }) => { }
 
@@ -16,7 +8,7 @@ type transformation = {
     apply: (data: { sourceKey: string, sourceNode: JSONContent, transformedValue: any, targetNode: JSONContent }) => void;
 }
 
-const transformations: transformation[] = [
+const toTipTapTransformation: transformation[] = [
     //Skip
     { selector: (data) => data.sourceKey === 'position', apply: skip },
     { selector: (data) => data.sourceKey === 'checked', apply: skip },
@@ -98,7 +90,7 @@ export function toTipTap(content: JSONContent): JSONContent {
     for (const key in content) {
         let value = content[key]
 
-        const transformation = transformations.find(x => x.selector({ sourceKey: key, sourceNode: content }));
+        const transformation = toTipTapTransformation.find(x => x.selector({ sourceKey: key, sourceNode: content }));
         if (transformation && transformation.apply === skip) {
             continue;
         }

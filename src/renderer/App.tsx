@@ -6,10 +6,14 @@ import MarkdownEditor from './editor/markdown-editor';
 import { useEffect, useState } from 'react';
 
 function App() {
-  const [activeMarkdown, setActiveMarkdown] = useState("");
 
-  const onMarkdownOpen = (event: any, content: string) => {
-    setActiveMarkdown(content);
+  const [activeMarkdown, setActiveMarkdown] = useState<{
+    content: string;
+    node: OverviewDefinition | SceneDefinition;
+  } | null>(null);
+
+  const onMarkdownOpen = (event: any, content: string, node: OverviewDefinition | SceneDefinition) => {
+    setActiveMarkdown({ content: content, node: node });
   };
 
   useEffect(() => {
@@ -35,7 +39,7 @@ function App() {
 
         {/* Right Pane: Working Area */}
         <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
-          <MarkdownEditor plainText={activeMarkdown} />
+          <MarkdownEditor plainText={activeMarkdown?.content} node={activeMarkdown?.node} />
           {/* Your main content goes here */}
         </Box>
       </Split>
