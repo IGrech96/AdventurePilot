@@ -4,7 +4,7 @@ import './markdown-editor.css'
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkStringify from 'remark-stringify';
-import {  toTipTap } from './json-mapper';
+import { toTipTap } from './json-mapper';
 import { useEffect, useRef } from 'react';
 
 
@@ -29,6 +29,13 @@ export default function MarkdownEditor({ plainText, node }: { plainText?: string
     }
   }
 
+  const onUpdate = () => {
+    const node = nodeRef.current;
+    if (node) {
+      window.applicationApi.file.invokeFileChanged(node);
+    }
+  }
+
   useEffect(() => {
     window.applicationApi.application.subscribe_onSaveRequest(save);
     return () => window.applicationApi.application.unsubscribe_onSaveRequest(save);
@@ -41,10 +48,10 @@ export default function MarkdownEditor({ plainText, node }: { plainText?: string
   const processed = toTipTap(tree);
 
   const text = JSON.stringify(processed, null, 2);
-
+5
   return (
     <>
-      <SimpleEditor ref={editorRef} jsonContent={processed} />
+      <SimpleEditor ref={editorRef} jsonContent={processed} onUpdate={onUpdate} />
     </>
   )
 }

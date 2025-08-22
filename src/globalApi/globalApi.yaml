@@ -5,6 +5,14 @@ api:
         channel: 'project-opened'
         args: 
         - data: ProjectConfiguration
+      invokeProjectItemClicked:
+        channel: 'item-clicked'
+        args:
+        - node: ProjectTreeItem
+      onProjectItemClicked:
+        channel: 'item-clicked'
+        args:
+        - node: ProjectTreeItem
     file:
       invokeOpenMarkdown:
         channel: 'open-markdown'
@@ -21,10 +29,21 @@ api:
         args:
         - content: string
         - node: SceneDefinition | OverviewDefinition
+      invokeFileChanged:
+        channel: 'file-changed'
+        args:
+        - node: SceneDefinition | OverviewDefinition
+      onFileChanged:
+        channel: 'file-changed'
+        args:
+        - node: SceneDefinition | OverviewDefinition
 
     application:
+      invokeSaveRequest:
+        channel: 'invoke-save'
       onSaveRequest:
         channel: 'save-requested'
+      
 
 models:
   ProjectConfiguration:
@@ -37,3 +56,8 @@ models:
   OverviewDefinition:
     name: string
     file: string
+  ProjectTreeItem:
+    children?: ProjectTreeItem[]
+    path?: string
+    type: "\"reserved\" | \"locations-root\" | \"location\" | \"overview\""
+    source?: OverviewDefinition | SceneDefinition

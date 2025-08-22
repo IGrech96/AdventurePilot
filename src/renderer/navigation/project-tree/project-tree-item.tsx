@@ -1,6 +1,6 @@
 import { TreeViewDefaultItemModelProperties } from "@mui/x-tree-view";
 
-export type nodetype = "reserved" | "scene" | "overview";
+export type nodetype = "reserved" | "locations-root" | "location" | "overview";
 
 export type ProjectTreeViewItem<R extends {} = TreeViewDefaultItemModelProperties> = R & {
   children?: ProjectTreeViewItem<R>[];
@@ -16,7 +16,7 @@ export function toTree(data: ProjectConfiguration | null): ProjectTreeViewItem[]
     const data: ProjectTreeViewItem[] = scenes.map(x => ({
       id: (iterator++).toString(),
       label: x.name,
-      type: 'scene',
+      type: 'location',
       path: x.file,
       source: x,
       children: extractLocations(x.scenes)
@@ -28,7 +28,7 @@ export function toTree(data: ProjectConfiguration | null): ProjectTreeViewItem[]
     {
       id: (iterator++).toString(), label: data?.overview?.name ?? "Adventure" , type: 'reserved', children: [
         { id: (iterator++).toString(), label: "Overview", type: 'overview', path: data?.overview?.file, source: data?.overview },
-        { id: (iterator++).toString(), label: "Locations", type: 'reserved', children: extractLocations(data?.scenes)  },
+        { id: (iterator++).toString(), label: "Locations", type: 'locations-root', children: extractLocations(data?.scenes)  },
       ]
     }
   ]

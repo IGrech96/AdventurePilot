@@ -4,7 +4,7 @@ import { dirname } from 'path';
 import path from 'path';
 import fs from 'fs';
 import ConfigurationManager from './config.js';
-import { applicationApi, OverviewDefinition, SceneDefinition } from './appApi.js';
+import { applicationApi, OverviewDefinition, ProjectTreeItem, SceneDefinition } from './appApi.js';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -74,6 +74,18 @@ export default class Main {
             fs.writeFileSync(path.join(projectFolder, node.file), content, {
                 encoding: 'utf-8'
             });
+        });
+
+        api.project.invokeProjectItemClicked( (event: any, node: ProjectTreeItem) => {
+            api.project.onProjectItemClicked(node);
+        });
+
+        api.file.invokeFileChanged( (event: any, node: SceneDefinition | OverviewDefinition) => {
+            api.file.onFileChanged(node);
+        });
+
+        api.application.invokeSaveRequest( (event: any) => {
+            api.application.onSaveRequest();
         });
     }
 

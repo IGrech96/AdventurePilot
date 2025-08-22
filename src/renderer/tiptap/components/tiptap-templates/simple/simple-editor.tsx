@@ -184,7 +184,8 @@ const MobileToolbarContent = ({
 )
 
 type SimpleEditorProperties = {
-  jsonContent: JSONContent
+  jsonContent: JSONContent;
+  onUpdate: () => void;
 }
 
 export type SimpleEditorHandle = {
@@ -199,13 +200,13 @@ function SimpleEditor(properties: SimpleEditorProperties, ref: React.Ref<SimpleE
   >("main")
   const toolbarRef = React.useRef<HTMLDivElement>(null)
 
-   useImperativeHandle(ref, () => ({
-      getContent: () => {
-       const storage = editor?.storage as any;
-       const data = storage?.markdown.getMarkdown();
-       return data as string;
-      }
-    }));
+  useImperativeHandle(ref, () => ({
+    getContent: () => {
+      const storage = editor?.storage as any;
+      const data = storage?.markdown.getMarkdown();
+      return data as string;
+    }
+  }));
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -218,6 +219,9 @@ function SimpleEditor(properties: SimpleEditorProperties, ref: React.Ref<SimpleE
         "aria-label": "Main content area, start typing to enter text.",
         class: "simple-editor",
       },
+    },
+    onUpdate({ editor }) {
+      properties.onUpdate();
     },
     extensions: [
       StarterKit.configure({

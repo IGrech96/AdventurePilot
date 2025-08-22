@@ -161,11 +161,7 @@ function ProjectTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHa
 
   const handleItemClicked = (vent: React.MouseEvent, itemId: string) => {
     const node = findNode(items, itemId);
-    if (node.type == 'overview' || node.type == 'scene') {
-      if (node.path && node.source) {
-        window.applicationApi.file.invokeOpenMarkdown(node.path, node.source);
-      }
-    }
+    window.applicationApi.project.invokeProjectItemClicked(node);
   }
 
   const IndentedDiv = ({ treeItemRef, props, position }: { treeItemRef: React.RefObject<HTMLLIElement | null>, props: TreeItemProps, position: dragndropposition }) => {
