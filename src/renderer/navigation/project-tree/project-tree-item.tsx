@@ -1,6 +1,5 @@
 import { TreeViewDefaultItemModelProperties } from "@mui/x-tree-view";
 
-export type nodetype = "reserved" | "locations-root" | "location" | "overview";
 
 export type ProjectTreeViewItem<R extends {} = TreeViewDefaultItemModelProperties> = R & {
   children?: ProjectTreeViewItem<R>[];
@@ -11,7 +10,7 @@ export type ProjectTreeViewItem<R extends {} = TreeViewDefaultItemModelPropertie
 
 export function toTree(data: ProjectConfiguration | null): ProjectTreeViewItem[] {
   let iterator = 0;
-  const extractLocations = (scenes: SceneDefinition[] | undefined | null):ProjectTreeViewItem[] =>{
+  const extractLocations = (scenes: SceneDefinition[] | undefined | null): ProjectTreeViewItem[] => {
     if (!scenes) return [];
     const data: ProjectTreeViewItem[] = scenes.map(x => ({
       id: (iterator++).toString(),
@@ -24,17 +23,31 @@ export function toTree(data: ProjectConfiguration | null): ProjectTreeViewItem[]
 
     return data;
   }
+  const extractother = (input: NpcDefinition[] | ArtifactDefinition[] | undefined | null, type: nodetype): ProjectTreeViewItem[] => {
+    if (!input) return [];
+    const data: ProjectTreeViewItem[] = input.map(x => ({
+      id: (iterator++).toString(),
+      label: x.name,
+      type: type,
+      path: x.file,
+      source: x,
+    }));
+
+    return data;
+  }
   return [
     {
-      id: (iterator++).toString(), label: data?.overview?.name ?? "Adventure" , type: 'reserved', children: [
+      id: (iterator++).toString(), label: data?.overview?.name ?? "Adventure", type: 'reserved', children: [
         { id: (iterator++).toString(), label: "Overview", type: 'overview', path: data?.overview?.file, source: data?.overview },
-        { id: (iterator++).toString(), label: "Locations", type: 'locations-root', children: extractLocations(data?.scenes)  },
+        { id: (iterator++).toString(), label: "Locations", type: 'locations-root', children: extractLocations(data?.scenes) },
+        { id: (iterator++).toString(), label: "NPCes", type: 'npces-root', children: extractother(data?.npces, 'npc') },
+        { id: (iterator++).toString(), label: "Artifacts", type: 'artifacts-root', children: extractother(data?.artifacts, 'artifact') },
       ]
     }
   ]
 }
 
-export function findNode(collection: ProjectTreeViewItem[], id: string) : ProjectTreeViewItem{
+export function findNode(collection: ProjectTreeViewItem[], id: string): ProjectTreeViewItem {
   if (id == "0") return collection[0];
 
   const [parent, index] = findPositionInParent(collection, id)!;

@@ -29,6 +29,8 @@ declare global {
     export interface ProjectConfiguration {
         overview: OverviewDefinition;
         scenes: SceneDefinition[];
+        artifacts: ArtifactDefinition[];
+        npces: NpcDefinition[];
     }
     export interface SceneDefinition {
         name: string;
@@ -39,10 +41,27 @@ declare global {
         name: string;
         file: string;
     }
+    export interface ArtifactDefinition {
+        name: string;
+        file: string;
+    }
+    export interface NpcDefinition {
+        name: string;
+        file: string;
+    }
     export interface ProjectTreeItem {
         children?: ProjectTreeItem[];
         path?: string;
-        type: "reserved" | "locations-root" | "location" | "overview";
+        type: nodetype;
         source?: OverviewDefinition | SceneDefinition;
     }
+    export type nodetype =
+        "reserved" |
+        "overview" |
+        "locations-root" |
+        "location" |
+        "npces-root" |
+        "npc" |
+        "artifacts-root" |
+        "artifact";
 }

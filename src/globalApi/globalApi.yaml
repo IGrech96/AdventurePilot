@@ -49,6 +49,8 @@ models:
   ProjectConfiguration:
     overview: OverviewDefinition
     scenes: SceneDefinition[]
+    artifacts: ArtifactDefinition[]
+    npces: NpcDefinition[]
   SceneDefinition:
     name: string
     file: string
@@ -56,8 +58,24 @@ models:
   OverviewDefinition:
     name: string
     file: string
+  ArtifactDefinition:
+    name: string
+    file: string
+  NpcDefinition:
+    name: string
+    file: string
   ProjectTreeItem:
     children?: ProjectTreeItem[]
     path?: string
-    type: "\"reserved\" | \"locations-root\" | \"location\" | \"overview\""
+    type: nodetype
     source?: OverviewDefinition | SceneDefinition
+enums:
+  nodetype:
+    - reserved
+    - overview
+    - locations-root
+    - location
+    - npces-root
+    - npc
+    - artifacts-root
+    - artifact

@@ -123,6 +123,27 @@ if (data && data.models) {
     });
 }
 
+if (data && data.enums) {
+    const enums = Object.keys(data.enums);
+
+    enums.forEach(enumName => {
+        rendererGlobalApi.push(`${indent(1)}export type ${enumName} =`);
+        electronMainApi.push(`export type ${enumName} = `);
+
+        const properties = Object.keys(data.enums[enumName]);
+
+        for (let index = 0; index < properties.length; index++) {
+            const elementName = properties[index];
+            const enumItem = data.enums[enumName][elementName];
+
+            const suffix = index == properties.length - 1 ? ';' : ' |'
+
+            rendererGlobalApi.push(`${indent(2)}"${enumItem}"${suffix}`);
+            electronMainApi.push(`${indent(1)}"${enumItem}"${suffix}`);
+        }
+    });
+}
+
 rendererGlobalApi.push("}");
 
 fs.writeFileSync('src/electron/appApi.preload.js', preloadLines.join('\n'))
