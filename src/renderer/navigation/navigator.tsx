@@ -11,7 +11,7 @@ export default function Navigator() {
     const [canSave, setCanSave] = useState(false);
 
     const invokeSave = (event: any) => {
-        window.applicationApi.application.invokeSaveRequest();
+        window.applicationApi.application.sendSaveRequest();
         setCanSave(false);
     }
 
@@ -19,7 +19,7 @@ export default function Navigator() {
         const onItemOpen = (event: any, node: ProjectTreeItem) => {
             if (node.type == 'overview' || node.type == 'location') {
                 if (node.path && node.source) {
-                    window.applicationApi.file.invokeOpenMarkdown(node.path, node.source);
+                    window.applicationApi.file.sendOpenMarkdown(node.path, node.source);
                 }
             }
 

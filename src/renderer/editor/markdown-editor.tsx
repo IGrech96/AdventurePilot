@@ -6,10 +6,16 @@ import remarkParse from 'remark-parse';
 import remarkStringify from 'remark-stringify';
 import { toTipTap } from './json-mapper';
 import { useEffect, useRef } from 'react';
+import path from 'path';
 
 
 export default function MarkdownEditor({ plainText, node }: { plainText?: string, node?: SceneDefinition | OverviewDefinition }) {
 
+  const getFileLinkSuggestions = (): {name: string, path: string}[] => {
+    const data = window.applicationApi.project.invokeGetAvailableItems();
+
+    return data.map(x => ({ name: x.name, path: x.file }));
+  }
   const nodeRef = useRef<SceneDefinition | OverviewDefinition>(null);
   useEffect(() => {
     if (node) {
@@ -25,14 +31,14 @@ export default function MarkdownEditor({ plainText, node }: { plainText?: string
     const markdown = editorRef.current?.getContent();
     const node = nodeRef.current;
     if (markdown && node) {
-      window.applicationApi.file.invokeSaveMarkdown(markdown, node);
+      window.applicationApi.file.sendSaveMarkdown(markdown, node);
     }
   }
 
   const onUpdate = () => {
     const node = nodeRef.current;
     if (node) {
-      window.applicationApi.file.invokeFileChanged(node);
+      window.applicationApi.file.sendFileChanged(node);
     }
   }
 
@@ -48,10 +54,15 @@ export default function MarkdownEditor({ plainText, node }: { plainText?: string
   const processed = toTipTap(tree);
 
   const text = JSON.stringify(processed, null, 2);
-5
+
   return (
     <>
-      <SimpleEditor ref={editorRef} jsonContent={processed} onUpdate={onUpdate} />
+      <SimpleEditor
+        ref={editorRef}
+        jsonContent={processed}
+        onUpdate={onUpdate}
+        getFileLinkSuggestions={getFileLinkSuggestions}
+        />
     </>
   )
 }

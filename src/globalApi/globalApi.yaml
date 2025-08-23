@@ -3,9 +3,9 @@ api:
     project:
       onProjectOpen:
         channel: 'project-opened'
-        args: 
+        args:
         - data: ProjectConfiguration
-      invokeProjectItemClicked:
+      sendProjectItemClicked:
         channel: 'item-clicked'
         args:
         - node: ProjectTreeItem
@@ -13,8 +13,11 @@ api:
         channel: 'item-clicked'
         args:
         - node: ProjectTreeItem
+      invokeGetAvailableItems:
+        channel: 'get-available-items'
+        return: (OverviewDefinition | SceneDefinition | NpcDefinition | ArtifactDefinition)[]
     file:
-      invokeOpenMarkdown:
+      sendOpenMarkdown:
         channel: 'open-markdown'
         args:
         - filePath: string
@@ -24,12 +27,12 @@ api:
         args:
         - content: string
         - node: SceneDefinition | OverviewDefinition
-      invokeSaveMarkdown:
+      sendSaveMarkdown:
         channel: 'save-markdown'
         args:
         - content: string
         - node: SceneDefinition | OverviewDefinition
-      invokeFileChanged:
+      sendFileChanged:
         channel: 'file-changed'
         args:
         - node: SceneDefinition | OverviewDefinition
@@ -39,11 +42,11 @@ api:
         - node: SceneDefinition | OverviewDefinition
 
     application:
-      invokeSaveRequest:
+      sendSaveRequest:
         channel: 'invoke-save'
       onSaveRequest:
         channel: 'save-requested'
-      
+
 
 models:
   ProjectConfiguration:
@@ -70,6 +73,11 @@ models:
     type: nodetype
     source?: OverviewDefinition | SceneDefinition
 enums:
+  sourcetype:
+    - OverviewDefinition
+    - SceneDefinition
+    - ArtifactDefinition
+    - NpcDefinition
   nodetype:
     - reserved
     - overview

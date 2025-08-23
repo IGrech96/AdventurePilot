@@ -6,21 +6,22 @@ declare global {
             project: {
                 subscribe_onProjectOpen: (callback: (event: any, data: ProjectConfiguration) => void) => void;
                 unsubscribe_onProjectOpen: (callback: (event: any, data: ProjectConfiguration) => void) => void;
-                invokeProjectItemClicked: (node: ProjectTreeItem) => void;
+                sendProjectItemClicked: (node: ProjectTreeItem) => void;
                 subscribe_onProjectItemClicked: (callback: (event: any, node: ProjectTreeItem) => void) => void;
                 unsubscribe_onProjectItemClicked: (callback: (event: any, node: ProjectTreeItem) => void) => void;
+                invokeGetAvailableItems: () => (OverviewDefinition | SceneDefinition | NpcDefinition | ArtifactDefinition)[];
             },
             file: {
-                invokeOpenMarkdown: (filePath: string, node: SceneDefinition | OverviewDefinition) => void;
+                sendOpenMarkdown: (filePath: string, node: SceneDefinition | OverviewDefinition) => void;
                 subscribe_onMarkdownOpen: (callback: (event: any, content: string, node: SceneDefinition | OverviewDefinition) => void) => void;
                 unsubscribe_onMarkdownOpen: (callback: (event: any, content: string, node: SceneDefinition | OverviewDefinition) => void) => void;
-                invokeSaveMarkdown: (content: string, node: SceneDefinition | OverviewDefinition) => void;
-                invokeFileChanged: (node: SceneDefinition | OverviewDefinition) => void;
+                sendSaveMarkdown: (content: string, node: SceneDefinition | OverviewDefinition) => void;
+                sendFileChanged: (node: SceneDefinition | OverviewDefinition) => void;
                 subscribe_onFileChanged: (callback: (event: any, node: SceneDefinition | OverviewDefinition) => void) => void;
                 unsubscribe_onFileChanged: (callback: (event: any, node: SceneDefinition | OverviewDefinition) => void) => void;
             },
             application: {
-                invokeSaveRequest: () => void;
+                sendSaveRequest: () => void;
                 subscribe_onSaveRequest: (callback: (event: any, ) => void) => void;
                 unsubscribe_onSaveRequest: (callback: (event: any, ) => void) => void;
             },
@@ -55,6 +56,11 @@ declare global {
         type: nodetype;
         source?: OverviewDefinition | SceneDefinition;
     }
+    export type sourcetype =
+        "OverviewDefinition" |
+        "SceneDefinition" |
+        "ArtifactDefinition" |
+        "NpcDefinition";
     export type nodetype =
         "reserved" |
         "overview" |

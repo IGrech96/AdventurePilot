@@ -12,136 +12,161 @@ const data = yaml.load(fileContents) as any;
 
 // generate-preload.ts
 const preloadLines: string[] = [
-    `const { contextBridge, ipcRenderer } = require('electron')`,
+  `const { contextBridge, ipcRenderer } = require('electron')`,
 ]
 
 const rendererGlobalApi: string[] = [
-    "export {}",
-    "",
-    "declare global {",
+  "export {}",
+  "",
+  "declare global {",
 ]
 
 const electronMainApi: string[] = [
-    "import { BrowserWindow } from 'electron';",
-    "import { ipcMain } from 'electron';",
-    ""
+  "import { BrowserWindow } from 'electron';",
+  "import { ipcMain } from 'electron';",
+  ""
 ]
 
 const indent = (level: number): string => {
-    return '    '.repeat(level);
+  return '    '.repeat(level);
 }
 
 if (data && data.api) {
-    const apis = Object.keys(data.api)
-    rendererGlobalApi.push(`${indent(1)}interface Window {`,);
+  const apis = Object.keys(data.api)
+  rendererGlobalApi.push(`${indent(1)}interface Window {`,);
 
-    apis.forEach(apiName => {
-        preloadLines.push(`contextBridge.exposeInMainWorld('${apiName}', {`);
-        rendererGlobalApi.push(`${indent(2)}${apiName}: {`);
+  apis.forEach(apiName => {
+    preloadLines.push(`contextBridge.exposeInMainWorld('${apiName}', {`);
+    rendererGlobalApi.push(`${indent(2)}${apiName}: {`);
 
-        electronMainApi.push(`export class ${apiName} {`);
-        electronMainApi.push(...[`${indent(1)}constructor(protected window: BrowserWindow) {`, `${indent(1)}}`]);
+    electronMainApi.push(`export class ${apiName} {`);
+    electronMainApi.push(...[`${indent(1)}constructor(protected window: BrowserWindow) {`, `${indent(1)}}`]);
 
-        const domains = Object.keys(data.api[apiName]);
-        domains.forEach(domainName => {
-            preloadLines.push(`${indent(1)}${domainName}: {`);
-            rendererGlobalApi.push(`${indent(3)}${domainName}: {`);
-            electronMainApi.push(`${indent(1)}public ${domainName} = {`);
+    const domains = Object.keys(data.api[apiName]);
+    domains.forEach(domainName => {
+      preloadLines.push(`${indent(1)}${domainName}: {`);
+      rendererGlobalApi.push(`${indent(3)}${domainName}: {`);
+      electronMainApi.push(`${indent(1)}public ${domainName} = {`);
 
-            const methods = Object.keys(data.api[apiName][domainName]);
+      const methods = Object.keys(data.api[apiName][domainName]);
 
-            methods.forEach(methodName => {
+      methods.forEach(methodName => {
 
-                const isEvent = methodName.startsWith('on');
-                const args: any[] = !!data.api[apiName][domainName][methodName].args
-                    ? Object.values(data.api[apiName][domainName][methodName].args)
-                    : [];
-                const channel = data.api[apiName][domainName][methodName].channel;
+        let type: 'send' | 'on' | 'invoke';
+        if (methodName.startsWith('on')) {
+          type = 'on';
+        } else if (methodName.startsWith('send')) {
+          type = 'send'
+        } else if (methodName.startsWith('invoke')) {
+          type = 'invoke';
+        }
+        else {
+          throw 'InvalidMethodType';
+        }
 
-                const argNames = args.map(x => Object.keys(x)[0]);
-                const argNameDefinitions = args.map(x => `${Object.keys(x)[0]}: ${x[Object.keys(x)[0]]}`);
+        const args: any[] = !!data.api[apiName][domainName][methodName].args
+          ? Object.values(data.api[apiName][domainName][methodName].args)
+          : [];
+        const channel = data.api[apiName][domainName][methodName].channel;
 
-                if (isEvent) {
-                    preloadLines.push(`${indent(2)}subscribe_${methodName}: (callback) => {`);
-                    preloadLines.push(`${indent(3)}ipcRenderer.on('${channel}', callback);`);
-                    preloadLines.push(`${indent(2)}},`);
+        const argNames = args.map(x => Object.keys(x)[0]);
+        const argNameDefinitions = args.map(x => `${Object.keys(x)[0]}: ${x[Object.keys(x)[0]]}`);
 
-                    preloadLines.push(`${indent(2)}unsubscribe_${methodName}: (callback) => {`);
-                    preloadLines.push(`${indent(3)}ipcRenderer.removeListener('${channel}', callback);`);
-                    preloadLines.push(`${indent(2)}},`);
+        if (type == 'on') {
+          preloadLines.push(`${indent(2)}subscribe_${methodName}: (callback) => {`);
+          preloadLines.push(`${indent(3)}ipcRenderer.on('${channel}', callback);`);
+          preloadLines.push(`${indent(2)}},`);
 
-                    rendererGlobalApi.push(`${indent(4)}subscribe_${methodName}: (callback: (event: any, ${argNameDefinitions.join(', ')}) => void) => void;`)
-                    rendererGlobalApi.push(`${indent(4)}unsubscribe_${methodName}: (callback: (event: any, ${argNameDefinitions.join(', ')}) => void) => void;`)
+          preloadLines.push(`${indent(2)}unsubscribe_${methodName}: (callback) => {`);
+          preloadLines.push(`${indent(3)}ipcRenderer.removeListener('${channel}', callback);`);
+          preloadLines.push(`${indent(2)}},`);
 
-                    electronMainApi.push(`${indent(2)}${methodName}: (${argNameDefinitions.join(', ')}) => {`)
-                    electronMainApi.push(`${indent(3)}this.window.webContents.send('${channel}', ${argNames.join(', ')});`)
-                    electronMainApi.push(`${indent(2)}},`);
-                }
-                else {
-                    preloadLines.push(`${indent(2)}${methodName}: (${argNames.join(', ')}) => {`);
-                    preloadLines.push(`${indent(3)}ipcRenderer.send('${data.api[apiName][domainName][methodName].channel}', ${argNames.join(', ')});`);
-                    preloadLines.push(`${indent(2)}},`);
+          rendererGlobalApi.push(`${indent(4)}subscribe_${methodName}: (callback: (event: any, ${argNameDefinitions.join(', ')}) => void) => void;`)
+          rendererGlobalApi.push(`${indent(4)}unsubscribe_${methodName}: (callback: (event: any, ${argNameDefinitions.join(', ')}) => void) => void;`)
 
-                    const argNamesTs = args.map(x => `${Object.keys(x)[0]}: ${x[Object.keys(x)[0]]}`);
-                    rendererGlobalApi.push(`${indent(4)}${methodName}: (${argNamesTs.join(', ')}) => void;`)
+          electronMainApi.push(`${indent(2)}${methodName}: (${argNameDefinitions.join(', ')}) => {`)
+          electronMainApi.push(`${indent(3)}this.window.webContents.send('${channel}', ${argNames.join(', ')});`)
+          electronMainApi.push(`${indent(2)}},`);
+        }
+        else if (type == 'send') {
+          preloadLines.push(`${indent(2)}${methodName}: (${argNames.join(', ')}) => {`);
+          preloadLines.push(`${indent(3)}ipcRenderer.send('${data.api[apiName][domainName][methodName].channel}', ${argNames.join(', ')});`);
+          preloadLines.push(`${indent(2)}},`);
 
-                    electronMainApi.push(`${indent(2)}${methodName}: (callback: (event: any, ${argNameDefinitions.join(', ')}) => void) => {`)
-                    electronMainApi.push(`${indent(3)}ipcMain.on('${channel}', callback);`)
-                    electronMainApi.push(`${indent(2)}},`);
-                }
-            });
+          const argNamesTs = args.map(x => `${Object.keys(x)[0]}: ${x[Object.keys(x)[0]]}`);
+          rendererGlobalApi.push(`${indent(4)}${methodName}: (${argNamesTs.join(', ')}) => void;`)
 
-            preloadLines.push(`${indent(1)}},`);
-            rendererGlobalApi.push(`${indent(3)}},`);
-            electronMainApi.push(`${indent(1)}}`);
-        });
+          const receiveName = methodName.replace('send', 'receive');
+          electronMainApi.push(`${indent(2)}${receiveName}: (callback: (event: any, ${argNameDefinitions.join(', ')}) => void) => {`)
+          electronMainApi.push(`${indent(3)}ipcMain.on('${channel}', callback);`)
+          electronMainApi.push(`${indent(2)}},`);
+        } else {
+          const ret = data.api[apiName][domainName][methodName].return;
+          preloadLines.push(`${indent(2)}${methodName}: (${argNames.join(', ')}) => {`);
+          preloadLines.push(`${indent(3)}return ipcRenderer.invoke('${data.api[apiName][domainName][methodName].channel}', ${argNames.join(', ')});`);
+          preloadLines.push(`${indent(2)}},`);
 
-        preloadLines.push('});');
-        rendererGlobalApi.push(`${indent(2)}},`);
-        electronMainApi.push(`}`);
+          const argNamesTs = args.map(x => `${Object.keys(x)[0]}: ${x[Object.keys(x)[0]]}`);
+          rendererGlobalApi.push(`${indent(4)}${methodName}: (${argNamesTs.join(', ')}) => ${ret};`)
+
+          const handleName = methodName.replace('invoke', 'handle');
+          electronMainApi.push(`${indent(2)}${handleName}: (callback: (event: any, ${argNameDefinitions.join(', ')}) => ${ret}) => {`)
+          electronMainApi.push(`${indent(3)}ipcMain.handle('${channel}', callback);`)
+          electronMainApi.push(`${indent(2)}},`);
+        }
+      });
+
+      preloadLines.push(`${indent(1)}},`);
+      rendererGlobalApi.push(`${indent(3)}},`);
+      electronMainApi.push(`${indent(1)}}`);
     });
 
-    rendererGlobalApi.push(`${indent(1)}}`)
+    preloadLines.push('});');
+    rendererGlobalApi.push(`${indent(2)}},`);
+    electronMainApi.push(`}`);
+  });
+
+  rendererGlobalApi.push(`${indent(1)}}`)
 }
 
 if (data && data.models) {
-    const models = Object.keys(data.models);
+  const models = Object.keys(data.models);
 
-    models.forEach(modelName => {
-        rendererGlobalApi.push(`${indent(1)}export interface ${modelName} {`);
-        electronMainApi.push(`export interface ${modelName} {`);
+  models.forEach(modelName => {
+    rendererGlobalApi.push(`${indent(1)}export interface ${modelName} {`);
+    electronMainApi.push(`export interface ${modelName} {`);
 
-        const properties = Object.keys(data.models[modelName]);
+    const properties = Object.keys(data.models[modelName]);
 
-        properties.forEach(element => {
-            rendererGlobalApi.push(`${indent(2)}${element}: ${data.models[modelName][element]};`);
-            electronMainApi.push(`${indent(1)}${element}: ${data.models[modelName][element]};`);
-        });
-
-        rendererGlobalApi.push(`${indent(1)}}`);
-        electronMainApi.push(`}`);
+    properties.forEach(element => {
+      rendererGlobalApi.push(`${indent(2)}${element}: ${data.models[modelName][element]};`);
+      electronMainApi.push(`${indent(1)}${element}: ${data.models[modelName][element]};`);
     });
+
+    rendererGlobalApi.push(`${indent(1)}}`);
+    electronMainApi.push(`}`);
+  });
 }
 
 if (data && data.enums) {
-    const enums = Object.keys(data.enums);
+  const enums = Object.keys(data.enums);
 
-    enums.forEach(enumName => {
-        rendererGlobalApi.push(`${indent(1)}export type ${enumName} =`);
-        electronMainApi.push(`export type ${enumName} = `);
+  enums.forEach(enumName => {
+    rendererGlobalApi.push(`${indent(1)}export type ${enumName} =`);
+    electronMainApi.push(`export type ${enumName} = `);
 
-        const properties = Object.keys(data.enums[enumName]);
+    const properties = Object.keys(data.enums[enumName]);
 
-        for (let index = 0; index < properties.length; index++) {
-            const elementName = properties[index];
-            const enumItem = data.enums[enumName][elementName];
+    for (let index = 0; index < properties.length; index++) {
+      const elementName = properties[index];
+      const enumItem = data.enums[enumName][elementName];
 
-            const suffix = index == properties.length - 1 ? ';' : ' |'
+      const suffix = index == properties.length - 1 ? ';' : ' |'
 
-            rendererGlobalApi.push(`${indent(2)}"${enumItem}"${suffix}`);
-            electronMainApi.push(`${indent(1)}"${enumItem}"${suffix}`);
-        }
-    });
+      rendererGlobalApi.push(`${indent(2)}"${enumItem}"${suffix}`);
+      electronMainApi.push(`${indent(1)}"${enumItem}"${suffix}`);
+    }
+  });
 }
 
 rendererGlobalApi.push("}");

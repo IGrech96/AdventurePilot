@@ -7,7 +7,7 @@ contextBridge.exposeInMainWorld('applicationApi', {
         unsubscribe_onProjectOpen: (callback) => {
             ipcRenderer.removeListener('project-opened', callback);
         },
-        invokeProjectItemClicked: (node) => {
+        sendProjectItemClicked: (node) => {
             ipcRenderer.send('item-clicked', node);
         },
         subscribe_onProjectItemClicked: (callback) => {
@@ -16,9 +16,12 @@ contextBridge.exposeInMainWorld('applicationApi', {
         unsubscribe_onProjectItemClicked: (callback) => {
             ipcRenderer.removeListener('item-clicked', callback);
         },
+        invokeGetAvailableItems: () => {
+            return ipcRenderer.invoke('get-available-items', );
+        },
     },
     file: {
-        invokeOpenMarkdown: (filePath, node) => {
+        sendOpenMarkdown: (filePath, node) => {
             ipcRenderer.send('open-markdown', filePath, node);
         },
         subscribe_onMarkdownOpen: (callback) => {
@@ -27,10 +30,10 @@ contextBridge.exposeInMainWorld('applicationApi', {
         unsubscribe_onMarkdownOpen: (callback) => {
             ipcRenderer.removeListener('markdown-opened', callback);
         },
-        invokeSaveMarkdown: (content, node) => {
+        sendSaveMarkdown: (content, node) => {
             ipcRenderer.send('save-markdown', content, node);
         },
-        invokeFileChanged: (node) => {
+        sendFileChanged: (node) => {
             ipcRenderer.send('file-changed', node);
         },
         subscribe_onFileChanged: (callback) => {
@@ -41,7 +44,7 @@ contextBridge.exposeInMainWorld('applicationApi', {
         },
     },
     application: {
-        invokeSaveRequest: () => {
+        sendSaveRequest: () => {
             ipcRenderer.send('invoke-save', );
         },
         subscribe_onSaveRequest: (callback) => {
