@@ -74,6 +74,7 @@ import "@/components/tiptap-templates/simple/simple-editor.scss"
 
 import content from "@/components/tiptap-templates/simple/data/content2.json"
 import { forwardRef, useImperativeHandle } from "react"
+import { MarkdownFileLink } from "@/extensions/markdown-file-link"
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -249,6 +250,8 @@ function SimpleEditor(properties: SimpleEditorProperties, ref: React.Ref<SimpleE
         upload: handleImageUpload,
         onError: (error) => console.error("Upload failed:", error),
       }),
+      MarkdownFileLink
+      ,
     ],
   })
 
