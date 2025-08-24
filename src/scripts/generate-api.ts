@@ -107,7 +107,7 @@ if (data && data.api) {
           preloadLines.push(`${indent(2)}},`);
 
           const argNamesTs = args.map(x => `${Object.keys(x)[0]}: ${x[Object.keys(x)[0]]}`);
-          rendererGlobalApi.push(`${indent(4)}${methodName}: (${argNamesTs.join(', ')}) => ${ret};`)
+          rendererGlobalApi.push(`${indent(4)}${methodName}: (${argNamesTs.join(', ')}) => Promise<${ret}>;`)
 
           const handleName = methodName.replace('invoke', 'handle');
           electronMainApi.push(`${indent(2)}${handleName}: (callback: (event: any, ${argNameDefinitions.join(', ')}) => ${ret}) => {`)

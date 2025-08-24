@@ -1636,6 +1636,11 @@
     "@tiptap/extensions" "^3.2.0"
     "@tiptap/pm" "^3.2.0"
 
+"@tiptap/suggestion@^3.3.0":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@tiptap/suggestion/-/suggestion-3.3.0.tgz#256e609fc56f1f3adfae876902a5a682dd845d2c"
+  integrity sha512-Levd9c/ZvILhupTukZOrLnULEW5B9vN+gQbJS6JMKG5eMuOE7t5jPMw+OUzbWGfOi/p9iRwwwh3FYSswjMrDzA==
+
 "@tootallnate/once@2":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-2.0.0.tgz#f544a148d3ab35801c1f633a7441fd87c2e484bf"

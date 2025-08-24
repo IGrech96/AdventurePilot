@@ -11,8 +11,8 @@ import path from 'path';
 
 export default function MarkdownEditor({ plainText, node }: { plainText?: string, node?: SceneDefinition | OverviewDefinition }) {
 
-  const getFileLinkSuggestions = (): {name: string, path: string}[] => {
-    const data = window.applicationApi.project.invokeGetAvailableItems();
+  const getFileLinkSuggestions = async (): Promise<{name: string, path: string}[]> => {
+    const data = await window.applicationApi.project.invokeGetAvailableItems();
 
     return data.map(x => ({ name: x.name, path: x.file }));
   }

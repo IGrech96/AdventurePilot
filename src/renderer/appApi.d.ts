@@ -9,7 +9,7 @@ declare global {
                 sendProjectItemClicked: (node: ProjectTreeItem) => void;
                 subscribe_onProjectItemClicked: (callback: (event: any, node: ProjectTreeItem) => void) => void;
                 unsubscribe_onProjectItemClicked: (callback: (event: any, node: ProjectTreeItem) => void) => void;
-                invokeGetAvailableItems: () => (OverviewDefinition | SceneDefinition | NpcDefinition | ArtifactDefinition)[];
+                invokeGetAvailableItems: () => Promise<(OverviewDefinition | SceneDefinition | NpcDefinition | ArtifactDefinition)[]>;
             },
             file: {
                 sendOpenMarkdown: (filePath: string, node: SceneDefinition | OverviewDefinition) => void;

@@ -1,0 +1,31 @@
+.suggestion-popup {
+  position: absolute !important;
+  z-index: 100;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 6px 10px;
+  font-size: 14px;
+  font-family: sans-serif;
+  color: #333;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: auto;
+}
+
+.suggestion-popup-item {
+  padding: 6px 8px;
+  margin: 0px 0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.suggestion-popup-item:hover {
+  background-color: #f0f0f0;
+}
+
+.suggestion-popup-item.active {
+  background-color: #e0e0ff;
+  font-weight: bold;
+}
