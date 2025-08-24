@@ -42,19 +42,6 @@ export function createOption(item: { name: string, path: string }): HTMLDivEleme
 
   option.attributes.setNamedItem(nameAttribute);
   option.attributes.setNamedItem(pathAttribute);
-  // e => {
-  //  e.preventDefault()
-  // Trigger command manually
-  // currentCommand?.(item)
-  // const editor = window.editor // or pass editor via closure
-  // editor.commands.insertContent({
-  //   type: 'markdownFileLink',
-  //   attrs: {
-  //     href: `/files/${item}`,
-  //     text: item,
-  //   },
-  // })
-  // })
 
   return option;
 }
@@ -72,18 +59,24 @@ export function handleKeyDown(
     event.preventDefault();
     const next = options[activeIndex + 1] || options[0];
     options.forEach(opt => opt.classList.remove('active'));
-    next.classList.add('active');
-    next.scrollIntoView({ block: 'nearest' });
-    return true;
+    if (next) {
+      next.classList.add('active');
+      next.scrollIntoView({ block: 'nearest' });
+      return true;
+    }
+    return false;
   }
 
   if (event.key === 'ArrowUp') {
     event.preventDefault();
     const prev = options[activeIndex - 1] || options[options.length - 1];
     options.forEach(opt => opt.classList.remove('active'));
-    prev.classList.add('active');
-    prev.scrollIntoView({ block: 'nearest' });
-    return true;
+    if (prev) {
+      prev.classList.add('active');
+      prev.scrollIntoView({ block: 'nearest' });
+      return true;
+    }
+    return false;
   }
 
   if (event.key === 'Enter') {
