@@ -1,7 +1,8 @@
-import { Node, mergeAttributes, InputRule, textPasteRule, Extension } from '@tiptap/core'
+import { Node, mergeAttributes, InputRule, textPasteRule, Extension, minMax } from '@tiptap/core'
 import Suggestion from '@tiptap/suggestion'
 import { createOption, createPopup, handleKeyDown } from './suggestion-popup'
 import './suggestion-popup.css'
+import { match } from 'assert';
 
 type data = { name: string; path: string };
 
@@ -23,11 +24,18 @@ function getSuggestionItems(query: any, getItems: () => data[]) {
   return distinctBy(result, x => x.name).slice(0, 5);
 }
 
-function handleSuggestionCommand({ editor, range, props }: { editor: any, range: any, props: data }) {
+function handleSuggestionCommand({ editor, range, props }: { editor: any, range: { from: number, to: number }, props: data }) {
+
+  const cursorPosition = editor.state.selection.anchor as number;
+
+  const newRange: { from: number, to: number } = {
+    from: Math.min(range.from, cursorPosition),
+    to: Math.max(range.to, cursorPosition)
+  };
   editor
     .chain()
     .focus()
-    .deleteRange(range)
+    .deleteRange(newRange)
     .insertContent({
       type: 'markdownFileLink',
       attrs: {
@@ -94,14 +102,35 @@ export const MarkdownFileLink = Node.create<MarkdownFileLinkOptions>({
   },
 
   addOptions() {
+    let latestSuggestionProps: {
+      editor: any,
+      range: Range,
+      props: any
+    } | null = null
+
     return {
       getItems: () => [],
       suggestion: (props: { getItems: () => data[] }) => ({
         char: '#', // Trigger character
+        match: /#([\w\-\/\.]+)/,
+        getMatch: ({ textBeforeCursor }: { textBeforeCursor: any }) => {
+          const match = textBeforeCursor.match(/#([\w\-\/\.]+)/)
+          if (!match) return null
+
+          return {
+            range: {
+              from: textBeforeCursor.length - match[0].length,
+              to: textBeforeCursor.length,
+            },
+            query: match[1],
+          }
+        },
         items: ({ query }: { query: any }) => {
           return getSuggestionItems(query, props.getItems)
         },
-        command: ({ editor, range, props }: { editor: any, range: any, props: data }) => handleSuggestionCommand({ editor, range, props }),
+        command: ({ editor, range, props }: { editor: any, range: any, props: data }) => {
+          handleSuggestionCommand({ editor, range, props })
+        },
         allow: ({ state, range }: { state: any, range: any }) => true,
         render: () => renderSuggestionPopup(),
       }),
@@ -138,6 +167,10 @@ export const MarkdownFileLink = Node.create<MarkdownFileLinkOptions>({
       }),
       HTMLAttributes.text
     ]
+  },
+
+  renderText(props: any) {
+    return ""
   },
 
   addInputRules() {

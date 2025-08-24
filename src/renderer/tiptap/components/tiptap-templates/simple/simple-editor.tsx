@@ -184,11 +184,14 @@ const MobileToolbarContent = ({
   </>
 )
 
+
+type suggestionData = { name: string, path: string };
+
 type SimpleEditorProperties = {
   jsonContent: JSONContent;
   onUpdate: () => void;
 
-  getFileLinkSuggestions: () => {name: string, path: string}[];
+  Suggestions: suggestionData[];
 }
 
 export type SimpleEditorHandle = {
@@ -252,7 +255,7 @@ function SimpleEditor(properties: SimpleEditorProperties, ref: React.Ref<SimpleE
         upload: handleImageUpload,
         onError: (error) => console.error("Upload failed:", error),
       }),
-      MarkdownFileLink.configure({ getItems: properties.getFileLinkSuggestions}),
+      MarkdownFileLink.configure({ getItems: () => properties.Suggestions}),
     ],
   })
 
