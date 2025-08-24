@@ -1,5 +1,6 @@
 import * as React from "react"
 import { EditorContent, EditorContext, JSONContent, useEditor } from "@tiptap/react"
+import { withCustomNodes } from './serializer'
 
 // --- Tiptap Core Extensions ---
 import { StarterKit } from "@tiptap/starter-kit"
@@ -208,9 +209,14 @@ function SimpleEditor(properties: SimpleEditorProperties, ref: React.Ref<SimpleE
 
   useImperativeHandle(ref, () => ({
     getContent: () => {
-      const storage = editor?.storage as any;
-      const data = storage?.markdown.getMarkdown();
-      return data as string;
+      // const storage = editor?.storage as any;
+      // const data = storage?.markdown.getMarkdown();
+      // return data as string;
+      if (editor && editor.state && editor.state.doc) {
+        const markdown = withCustomNodes(editor).serialize(editor?.state.doc)
+        return markdown;
+      }
+      return "";
     }
   }));
 
@@ -237,7 +243,9 @@ function SimpleEditor(properties: SimpleEditorProperties, ref: React.Ref<SimpleE
           enableClickSelection: true,
         },
       }),
-      Markdown,
+      Markdown.configure({
+        linkify: true
+      }),
       HorizontalRule,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       TaskList,
@@ -255,7 +263,7 @@ function SimpleEditor(properties: SimpleEditorProperties, ref: React.Ref<SimpleE
         upload: handleImageUpload,
         onError: (error) => console.error("Upload failed:", error),
       }),
-      MarkdownFileLink.configure({ getItems: () => properties.Suggestions}),
+      MarkdownFileLink.configure({ getItems: () => properties.Suggestions }),
     ],
   })
 

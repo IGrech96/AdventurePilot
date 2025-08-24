@@ -11,6 +11,10 @@ type MarkdownFileLinkOptions = {
   suggestion: (props: { getItems: () => data[] }) => any;
 };
 
+export function renderMarkdown(state: any, node: any) {
+  state.write(`[${node.attrs.text}](${node.attrs.href})`)
+}
+
 function getSuggestionItems(query: any, getItems: () => data[]) {
   function distinctBy<T>(array: T[], keyFn: (item: T) => any): T[] {
     return array.filter(
@@ -167,10 +171,6 @@ export const MarkdownFileLink = Node.create<MarkdownFileLinkOptions>({
       }),
       HTMLAttributes.text
     ]
-  },
-
-  renderText(props: any) {
-    return ""
   },
 
   addInputRules() {
