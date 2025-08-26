@@ -105,6 +105,10 @@ export default class Main {
 
       return result;
     });
+
+    api.file.handleGetFilePreview((event: any, filePath: string) => {
+      return "kasjdahhshshdshdahsdh"
+    })
   }
 
   public Save(): void {

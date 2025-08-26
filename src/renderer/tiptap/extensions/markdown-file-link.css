@@ -1,0 +1,54 @@
+.markdown-file-link {
+  text-decoration: none !important;
+}
+
+.markdown-file-linka:hover,
+.markdown-file-linka:focus {
+  text-decoration: underline !important;
+}
+
+.markdown-file-link-popup {
+  position: absolute;
+  display: block;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.15s ease-out;
+  z-index: 1000;
+  top: 100%;
+  /* Below the link */
+  left: 0;
+}
+
+a {
+  position: relative;
+}
+
+a:hover {
+  >.markdown-file-link-popup {
+    /* position: relative; */
+    max-height: 90vh;
+    min-width: 30vh;
+    transition: max-height 0.25s ease-out;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    >.header {
+      position: relative;
+      width: 100%;
+      border-bottom: 2px black;
+      border-bottom-style: solid;
+
+      color: #000;
+    }
+
+    >.details {
+      position: relative;
+      width: 100%;
+
+      color: #4e4c4c;
+    }
+  }
+}

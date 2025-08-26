@@ -19,6 +19,7 @@ declare global {
                 sendFileChanged: (node: SceneDefinition | OverviewDefinition) => void;
                 subscribe_onFileChanged: (callback: (event: any, node: SceneDefinition | OverviewDefinition) => void) => void;
                 unsubscribe_onFileChanged: (callback: (event: any, node: SceneDefinition | OverviewDefinition) => void) => void;
+                invokeGetFilePreview: (filePath: string) => Promise<string>;
             },
             application: {
                 sendSaveRequest: () => void;

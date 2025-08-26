@@ -42,6 +42,9 @@ contextBridge.exposeInMainWorld('applicationApi', {
         unsubscribe_onFileChanged: (callback) => {
             ipcRenderer.removeListener('file-changed', callback);
         },
+        invokeGetFilePreview: (filePath) => {
+            return ipcRenderer.invoke('get-file-preview', filePath);
+        },
     },
     application: {
         sendSaveRequest: () => {

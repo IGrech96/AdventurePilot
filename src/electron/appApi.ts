@@ -34,6 +34,9 @@ export class applicationApi {
         onFileChanged: (node: SceneDefinition | OverviewDefinition) => {
             this.window.webContents.send('file-changed', node);
         },
+        handleGetFilePreview: (callback: (event: any, filePath: string) => string) => {
+            ipcMain.handle('get-file-preview', callback);
+        },
     }
     public application = {
         receiveSaveRequest: (callback: (event: any, ) => void) => {

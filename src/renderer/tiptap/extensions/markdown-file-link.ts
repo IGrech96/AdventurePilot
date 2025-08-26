@@ -1,18 +1,41 @@
-import { Node, mergeAttributes, InputRule, textPasteRule, Extension, minMax } from '@tiptap/core'
+/** @jsxImportSource @tiptap/core */
+
+import { Node, mergeAttributes, InputRule, textPasteRule, Extension, minMax, Editor } from '@tiptap/core'
 import Suggestion from '@tiptap/suggestion'
 import { createOption, createPopup, handleKeyDown } from './suggestion-popup'
 import './suggestion-popup.css'
+import './markdown-file-link.css'
 import { match } from 'assert';
+import { Transaction } from '@tiptap/pm/state'
 
 type data = { name: string; path: string };
 
 type MarkdownFileLinkOptions = {
   getItems: () => data[];
+  getPreview: () => Promise<string>;
   suggestion: (props: { getItems: () => data[] }) => any;
 };
 
 export function renderMarkdown(state: any, node: any) {
   state.write(`[${node.attrs.text}](${node.attrs.href})`)
+}
+
+function openPopupCallback(getPreview: () => Promise<string>): (event: MouseEvent) => any {
+  return (event: MouseEvent) => {
+    const link = event.currentTarget as any;
+    const filePath = link.attributes.href.value
+    window.applicationApi.file
+      .invokeGetFilePreview(filePath)
+      .then(data => {
+        const popup = link.querySelector('div.markdown-file-link-popup');
+        // popup.children = [];
+        const contentDiv = document.createElement('div');
+        contentDiv.innerText = data;
+
+        popup.textContent = null;
+        popup.appendChild(contentDiv);
+      });
+  }
 }
 
 function getSuggestionItems(query: any, getItems: () => data[]) {
@@ -106,14 +129,10 @@ export const MarkdownFileLink = Node.create<MarkdownFileLinkOptions>({
   },
 
   addOptions() {
-    let latestSuggestionProps: {
-      editor: any,
-      range: Range,
-      props: any
-    } | null = null
 
     return {
       getItems: () => [],
+      getPreview: () => Promise.resolve(""),
       suggestion: (props: { getItems: () => data[] }) => ({
         char: '#', // Trigger character
         match: /#([\w\-\/\.]+)/,
@@ -141,6 +160,42 @@ export const MarkdownFileLink = Node.create<MarkdownFileLinkOptions>({
     }
   },
 
+  // onTransaction({ editor, transaction }: { editor: Editor, transaction: Transaction }) {
+  //   const allLinks = editor.view.dom.querySelectorAll('a[data-md-link]');
+
+  //   const callback: (event: any) => void =  openPopupCallback(this.options.getPreview);
+  //   allLinks.forEach(link => {
+  //     link.removeEventListener('mouseenter', callback);
+  //     link.addEventListener('mouseenter', callback);
+  //   })
+  // },
+
+  addNodeView() {
+    return ({ node, getPos, editor }) => {
+      const link = document.createElement('a');
+      link.setAttribute('href', node.attrs.href);
+      link.setAttribute('data-md-link', node.attrs['data-md-link']);
+      link.textContent = node.attrs.text;
+      link.classList.add('markdown-file-link');
+
+      const popupTemplate = document.createElement('div');
+      popupTemplate.classList.add('markdown-file-link-popup');
+
+      link.appendChild(popupTemplate);
+
+      const mouseEnterCallback = openPopupCallback(this.options.getPreview);
+
+      link.addEventListener('mouseenter', mouseEnterCallback);
+
+      return {
+        dom: link,
+        destroy() {
+          link.removeEventListener('mouseenter', mouseEnterCallback);
+        },
+      };
+    };
+  },
+
   addProseMirrorPlugins() {
     return [
       Suggestion({
@@ -161,6 +216,8 @@ export const MarkdownFileLink = Node.create<MarkdownFileLinkOptions>({
   },
 
   renderHTML({ HTMLAttributes }) {
+    const card = ['div', { class: 'markdown-file-link-popup' }];
+
     return [
       'a',
       mergeAttributes(
@@ -169,7 +226,8 @@ export const MarkdownFileLink = Node.create<MarkdownFileLinkOptions>({
         href: HTMLAttributes.href,
         class: 'markdown-file-link'
       }),
-      HTMLAttributes.text
+      HTMLAttributes.text,
+      card
     ]
   },
 

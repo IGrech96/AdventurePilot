@@ -40,6 +40,11 @@ api:
         channel: 'file-changed'
         args:
         - node: SceneDefinition | OverviewDefinition
+      invokeGetFilePreview:
+        channel: 'get-file-preview'
+        args:
+        - filePath: string
+        return: string
 
     application:
       sendSaveRequest:

@@ -96,17 +96,25 @@ const toTipTapNodeTransformation: nodeTransformation[] = [
       const text = data.sourceNode.children[0].value;
       const href = data.sourceNode.url;
 
-      data.targetNode.type = 'text';
-      data.targetNode.marks ??= [];
-      data.targetNode.marks.push({
-        type: 'link',
-        attrs: {
-          "href": href,
-          "target": "_blank",
-          "rel": "noopener noreferrer nofollow",
-          "class": null
-        }
-      });
+      if (href && href.endsWith('.md')) {
+        data.targetNode.type = 'markdownFileLink';
+        data.targetNode.attrs ??= {};
+        data.targetNode.attrs.href = href;
+        data.targetNode.attrs.text = text;
+      }
+      else {
+        data.targetNode.type = 'text';
+        data.targetNode.marks ??= [];
+        data.targetNode.marks.push({
+          type: 'link',
+          attrs: {
+            "href": href,
+            "target": "_blank",
+            "rel": "noopener noreferrer nofollow",
+            "class": null
+          }
+        });
+      }
       data.targetNode.text = text;
 
       data.sourceNode.children = undefined;
