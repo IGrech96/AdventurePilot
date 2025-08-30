@@ -107,7 +107,11 @@ export default class Main {
     });
 
     api.file.handleGetFilePreview((event: any, filePath: string) => {
-      return "kasjdahhshshdshdahsdh"
+      let content = fs.readFileSync(path.join(projectFolder, filePath), 'utf8');
+      if (!content) {
+        content = ""
+      }
+      return content;
     })
   }
 

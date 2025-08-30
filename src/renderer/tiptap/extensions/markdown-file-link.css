@@ -26,7 +26,7 @@ a {
 a:hover {
   >.markdown-file-link-popup {
     /* position: relative; */
-    max-height: 90vh;
+    max-height: 900vh;
     min-width: 30vh;
     transition: max-height 0.25s ease-out;
     border: 1px solid #ddd;
@@ -34,21 +34,7 @@ a:hover {
     padding: 16px;
     background: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-    >.header {
-      position: relative;
-      width: 100%;
-      border-bottom: 2px black;
-      border-bottom-style: solid;
-
-      color: #000;
-    }
-
-    >.details {
-      position: relative;
-      width: 100%;
-
-      color: #4e4c4c;
-    }
+    height: 500px;
+    color: #000;
   }
 }

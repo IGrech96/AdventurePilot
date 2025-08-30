@@ -87,7 +87,9 @@
     "react-dom": "^19.1.1",
     "react-hotkeys-hook": "^5.1.0",
     "react-split": "^2.0.14",
+    "rehype-stringify": "^10.0.1",
     "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
     "remark-stringify": "^11.0.0",
     "tiptap-markdown": "^0.8.10",
     "unified": "^11.0.5"

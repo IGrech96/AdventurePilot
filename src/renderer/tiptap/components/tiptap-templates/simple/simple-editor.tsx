@@ -193,6 +193,7 @@ type SimpleEditorProperties = {
   onUpdate: () => void;
 
   Suggestions: suggestionData[];
+  getPreview: (filePath: string) => Promise<string>;
 }
 
 export type SimpleEditorHandle = {
@@ -263,7 +264,10 @@ function SimpleEditor(properties: SimpleEditorProperties, ref: React.Ref<SimpleE
         upload: handleImageUpload,
         onError: (error) => console.error("Upload failed:", error),
       }),
-      MarkdownFileLink.configure({ getItems: () => properties.Suggestions }),
+      MarkdownFileLink.configure({
+        getItems: () => properties.Suggestions,
+        getPreview: properties.getPreview
+      }),
     ],
   })
 

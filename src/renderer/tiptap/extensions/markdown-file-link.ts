@@ -12,7 +12,7 @@ type data = { name: string; path: string };
 
 type MarkdownFileLinkOptions = {
   getItems: () => data[];
-  getPreview: () => Promise<string>;
+  getPreview: (filePath: string) => Promise<string>;
   suggestion: (props: { getItems: () => data[] }) => any;
 };
 
@@ -20,17 +20,16 @@ export function renderMarkdown(state: any, node: any) {
   state.write(`[${node.attrs.text}](${node.attrs.href})`)
 }
 
-function openPopupCallback(getPreview: () => Promise<string>): (event: MouseEvent) => any {
+function openPopupCallback(getPreview: (filePath: string) => Promise<string>): (event: MouseEvent) => any {
   return (event: MouseEvent) => {
     const link = event.currentTarget as any;
     const filePath = link.attributes.href.value
-    window.applicationApi.file
-      .invokeGetFilePreview(filePath)
+    getPreview(filePath)
       .then(data => {
         const popup = link.querySelector('div.markdown-file-link-popup');
         // popup.children = [];
         const contentDiv = document.createElement('div');
-        contentDiv.innerText = data;
+        contentDiv.innerHTML = data;
 
         popup.textContent = null;
         popup.appendChild(contentDiv);
@@ -132,7 +131,7 @@ export const MarkdownFileLink = Node.create<MarkdownFileLinkOptions>({
 
     return {
       getItems: () => [],
-      getPreview: () => Promise.resolve(""),
+      getPreview: (filePath: string) => Promise.resolve(""),
       suggestion: (props: { getItems: () => data[] }) => ({
         char: '#', // Trigger character
         match: /#([\w\-\/\.]+)/,

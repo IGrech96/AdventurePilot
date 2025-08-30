@@ -3,12 +3,25 @@ import SimpleEditor from '@/components/tiptap-templates/simple/simple-editor'
 import './markdown-editor.css'
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
-import remarkStringify from 'remark-stringify';
 import { toTipTap } from './json-mapper';
 import { useEffect, useRef, useState } from 'react';
-import path from 'path';
+import { JSONContent } from '@tiptap/core';
+import remarkRehype from 'remark-rehype';
+import rehypeStringify from 'rehype-stringify';
 
 type suggestionData = { name: string, path: string };
+
+function convertToTipTapJson(plainText: string): JSONContent {
+  const tree = unified()
+    .use(remarkParse)
+    .parse(plainText);
+
+  const processed = toTipTap(tree);
+
+  const text = JSON.stringify(processed, null, 2);
+
+  return processed;
+}
 
 export default function MarkdownEditor({ plainText, node }: { plainText?: string, node?: SceneDefinition | OverviewDefinition }) {
 
@@ -56,21 +69,28 @@ export default function MarkdownEditor({ plainText, node }: { plainText?: string
     return () => window.applicationApi.application.unsubscribe_onSaveRequest(save);
   });
 
-  const tree = unified()
-    .use(remarkParse)
-    .parse(plainText);
 
-  const processed = toTipTap(tree);
 
-  const text = JSON.stringify(processed, null, 2);
+  const getPreview = async (filePath: string): Promise<string> => {
+    const previewData = await window.applicationApi.file.invokeGetFilePreview(filePath);
+
+    const data = await unified()
+      .use(remarkParse)         // Parse Markdown to MDAST
+      .use(remarkRehype)        // Convert MDAST to HAST
+      .use(rehypeStringify)     // Serialize HAST to HTML
+      .process(previewData);
+
+      return String(data);
+  }
 
   return (
     <>
       <SimpleEditor
         ref={editorRef}
-        jsonContent={processed}
+        jsonContent={convertToTipTapJson(plainText ?? '')}
         onUpdate={onUpdate}
         Suggestions={suggestions}
+        getPreview={getPreview}
       />
     </>
   )
