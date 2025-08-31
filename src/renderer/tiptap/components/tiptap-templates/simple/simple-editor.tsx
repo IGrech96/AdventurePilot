@@ -75,7 +75,8 @@ import "@/components/tiptap-templates/simple/simple-editor.scss"
 
 import content from "@/components/tiptap-templates/simple/data/content2.json"
 import { forwardRef, useImperativeHandle } from "react"
-import { MarkdownFileLink } from "@/extensions/markdown-file-link"
+import { MarkdownFileLink } from "@/extensions/markdown-file-link/markdown-file-link"
+import { LocalImage } from "@/extensions/local-image/local-image"
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -254,7 +255,8 @@ function SimpleEditor(properties: SimpleEditorProperties, ref: React.Ref<SimpleE
       TaskList,
       TaskItem.configure({ nested: true }),
       Highlight.configure({ multicolor: true }),
-      Image,
+      // Image,
+      LocalImage,
       Typography,
       Superscript,
       Subscript,

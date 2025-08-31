@@ -128,15 +128,15 @@ const toTipTapNodeTransformation: nodeTransformation[] = [
       const alt = data.sourceNode.alt;
       const title = data.sourceNode.title;
 
-      if (src){
-        const encoded = await window.applicationApi.file.invokeGetImageAsBase64(src);
-        src = `data:image/jpg;base64,${encoded}`
-      }
+      // if (src){
+      //   const encoded = await window.applicationApi.file.invokeGetImageAsBase64(src);
+      //   src = `data:image/jpg;base64,${encoded}`
+      // }
 
       data.targetNode.type = 'image';
       data.targetNode.attrs ??= {};
       data.targetNode.attrs.src = src;
-      data.targetNode.attrs.sourceSrc = sourceSrc;
+      // data.targetNode.attrs.sourceSrc = sourceSrc;
       data.targetNode.attrs.alt = alt;
       data.targetNode.attrs.title = title;
 

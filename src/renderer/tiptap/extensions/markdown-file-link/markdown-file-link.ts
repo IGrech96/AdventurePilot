@@ -16,10 +16,6 @@ type MarkdownFileLinkOptions = {
   suggestion: (props: { getItems: () => data[] }) => any;
 };
 
-export function renderMarkdown(state: any, node: any) {
-  state.write(`[${node.attrs.text}](${node.attrs.href})`)
-}
-
 function openPopupCallback(getPreview: (filePath: string) => Promise<string>): (event: MouseEvent) => any {
   return (event: MouseEvent) => {
     const link = event.currentTarget as any;

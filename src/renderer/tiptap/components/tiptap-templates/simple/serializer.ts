@@ -1,5 +1,5 @@
-import { renderMarkdown } from '@/extensions/markdown-file-link';
-import { Editor } from '@tiptap/core'
+import { renderMarkdown as fileLinkSerializer } from '@/extensions/markdown-file-link/serializer';
+import { renderMarkdown as localImagerSerializer } from '@/extensions/local-image/serializer';
 import { MarkdownSerializer } from 'prosemirror-markdown'
 
 export function withCustomNodes(editor: any): MarkdownSerializer {
@@ -8,7 +8,8 @@ export function withCustomNodes(editor: any): MarkdownSerializer {
   const advancedSerializer = new MarkdownSerializer(
     {
       ...defaultMarkdownSerializer.nodes,
-      markdownFileLink: renderMarkdown
+      markdownFileLink: fileLinkSerializer,
+      image: localImagerSerializer,
     },
     defaultMarkdownSerializer.marks
   )

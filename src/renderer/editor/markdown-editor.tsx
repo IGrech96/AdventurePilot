@@ -105,7 +105,10 @@ export default function MarkdownEditor({ plainText, node }: { plainText?: string
     if (node) {
       const name = file.name;
       const bytes = new Uint8Array(await file.arrayBuffer())
-      return window.applicationApi.file.invokeSaveItemImage(node, name, bytes);
+      const data = window.applicationApi.file.invokeSaveItemImage(node, name, bytes);
+
+      data.then(x => {});
+      return data;
     }
 
     throw new Error('Unexpected error');

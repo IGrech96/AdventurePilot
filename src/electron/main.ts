@@ -130,7 +130,7 @@ export default class Main {
         fs.mkdirSync(fullDirPath, { recursive: true });
       }
       fs.writeFileSync(fullFilePath, data, { flush: true });
-      return path.join('/', rootFolder, subfolder, name);
+      return path.join('/', rootFolder, subfolder, name).replace(/\\/g, '/');
     })
 
     api.file.handleGetImageAsBase64((event: any, filePath: string) => {
