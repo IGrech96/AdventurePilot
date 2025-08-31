@@ -8,12 +8,14 @@ import { useEffect, useRef, useState } from 'react';
 import { JSONContent } from '@tiptap/core';
 import remarkRehype from 'remark-rehype';
 import rehypeStringify from 'rehype-stringify';
+import remarkGfm from 'remark-gfm';
 
 type suggestionData = { name: string, path: string };
 
 async function convertToTipTapJson(plainText: string): Promise<JSONContent> {
   const tree = unified()
     .use(remarkParse)
+    .use(remarkGfm)
     .parse(plainText);
 
   const processed = await toTipTap(tree);

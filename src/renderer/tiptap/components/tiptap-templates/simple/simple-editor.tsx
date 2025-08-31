@@ -13,6 +13,8 @@ import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
 import { Selection } from "@tiptap/extensions"
 import { Markdown } from 'tiptap-markdown';
+import { Table, } from '@tiptap/extension-table/table'
+import { TableKit } from '@tiptap/extension-table'
 
 // --- UI Primitives ---
 import { Button } from "@/components/tiptap-ui-primitive/button"
@@ -77,6 +79,7 @@ import content from "@/components/tiptap-templates/simple/data/content2.json"
 import { forwardRef, useImperativeHandle } from "react"
 import { MarkdownFileLink } from "@/extensions/markdown-file-link/markdown-file-link"
 import { LocalImage } from "@/extensions/local-image/local-image"
+import { TableToolbar } from "@/extensions/table-toolbar/table-toolbar"
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -138,6 +141,12 @@ const MainToolbarContent = ({
         <TextAlignButton align="center" />
         <TextAlignButton align="right" />
         <TextAlignButton align="justify" />
+      </ToolbarGroup>
+
+      <ToolbarSeparator />
+
+      <ToolbarGroup>
+        <TableToolbar />
       </ToolbarGroup>
 
       <ToolbarSeparator />
@@ -272,6 +281,7 @@ function SimpleEditor(properties: SimpleEditorProperties, ref: React.Ref<SimpleE
         getItems: () => properties.Suggestions,
         getPreview: properties.getPreview
       }),
+      TableKit
     ],
   })
 

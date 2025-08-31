@@ -18,6 +18,7 @@ const toTipTapAttributeTransformation: attributeTransformation[] = [
   { selector: (data) => data.sourceKey === 'position', apply: skip },
   { selector: (data) => data.sourceKey === 'checked', apply: skip },
   { selector: (data) => data.sourceKey === 'spread', apply: skip },
+  { selector: (data) => data.sourceKey === 'align', apply: skip },
 
   //rename node
   { selector: (data) => data.sourceKey === 'children', apply: (data) => data.targetNode['content'] = data.transformedValue },
@@ -33,6 +34,7 @@ const toTipTapAttributeTransformation: attributeTransformation[] = [
   { selector: (data) => data.sourceNode.type === 'root', apply: (data) => data.targetNode.type = 'doc' },
   { selector: (data) => data.sourceNode.type === 'html', apply: (data) => data.targetNode.type = 'text' },
   { selector: (data) => data.sourceNode.type === 'list', apply: (data) => data.targetNode.type = 'bulletList' },
+  { selector: (data) => data.sourceNode.type === 'break', apply: (data) => data.targetNode.type = 'hardBreak' },
 ];
 
 const toTipTapNodeTransformation: nodeTransformation[] = [
