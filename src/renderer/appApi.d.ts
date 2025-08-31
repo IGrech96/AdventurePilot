@@ -20,6 +20,8 @@ declare global {
                 subscribe_onFileChanged: (callback: (event: any, node: SceneDefinition | OverviewDefinition) => void) => void;
                 unsubscribe_onFileChanged: (callback: (event: any, node: SceneDefinition | OverviewDefinition) => void) => void;
                 invokeGetFilePreview: (filePath: string) => Promise<string>;
+                invokeSaveItemImage: (node: SceneDefinition | OverviewDefinition, imageName: string, data: Uint8Array<ArrayBuffer>) => Promise<string>;
+                invokeGetImageAsBase64: (path: string) => Promise<string>;
             },
             application: {
                 sendSaveRequest: () => void;

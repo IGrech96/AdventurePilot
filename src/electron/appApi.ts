@@ -37,6 +37,12 @@ export class applicationApi {
         handleGetFilePreview: (callback: (event: any, filePath: string) => string) => {
             ipcMain.handle('get-file-preview', callback);
         },
+        handleSaveItemImage: (callback: (event: any, node: SceneDefinition | OverviewDefinition, imageName: string, data: Uint8Array<ArrayBuffer>) => string) => {
+            ipcMain.handle('save-item-image', callback);
+        },
+        handleGetImageAsBase64: (callback: (event: any, path: string) => string) => {
+            ipcMain.handle('get-image-as-base64', callback);
+        },
     }
     public application = {
         receiveSaveRequest: (callback: (event: any, ) => void) => {

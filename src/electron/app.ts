@@ -23,5 +23,3 @@ const debugMenu = new MenuItem({
 
 mainMenu.append(debugMenu);
 Menu.setApplicationMenu(mainMenu);
-
-

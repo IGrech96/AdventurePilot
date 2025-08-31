@@ -37,8 +37,7 @@ export function toTree(data: ProjectConfiguration | null): ProjectTreeViewItem[]
   }
   return [
     {
-      id: (iterator++).toString(), label: data?.overview?.name ?? "Adventure", type: 'reserved', children: [
-        { id: (iterator++).toString(), label: "Overview", type: 'overview', path: data?.overview?.file, source: data?.overview },
+      id: (iterator++).toString(), label: data?.overview?.name ?? "Adventure", type: 'overview', path: data?.overview?.file, source: data?.overview, children: [
         { id: (iterator++).toString(), label: "Locations", type: 'locations-root', children: extractLocations(data?.scenes) },
         { id: (iterator++).toString(), label: "NPCes", type: 'npces-root', children: extractother(data?.npces, 'npc') },
         { id: (iterator++).toString(), label: "Artifacts", type: 'artifacts-root', children: extractother(data?.artifacts, 'artifact') },

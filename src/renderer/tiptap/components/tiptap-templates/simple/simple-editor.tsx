@@ -189,11 +189,13 @@ const MobileToolbarContent = ({
 type suggestionData = { name: string, path: string };
 
 type SimpleEditorProperties = {
-  jsonContent: JSONContent;
+  jsonContent: JSONContent | null;
   onUpdate: () => void;
 
   Suggestions: suggestionData[];
   getPreview: (filePath: string) => Promise<string>;
+
+  uploadImage: (file: File, onProgress?: (event: { progress: number }) => void) => Promise<string>;
 }
 
 export type SimpleEditorHandle = {
@@ -260,8 +262,8 @@ function SimpleEditor(properties: SimpleEditorProperties, ref: React.Ref<SimpleE
       ImageUploadNode.configure({
         accept: "image/*",
         maxSize: MAX_FILE_SIZE,
-        limit: 3,
-        upload: handleImageUpload,
+        limit: 1,
+        upload: properties.uploadImage,
         onError: (error) => console.error("Upload failed:", error),
       }),
       MarkdownFileLink.configure({
@@ -271,8 +273,9 @@ function SimpleEditor(properties: SimpleEditorProperties, ref: React.Ref<SimpleE
     ],
   })
 
-  editor?.commands.setContent(properties.jsonContent);
-
+  if (properties.jsonContent) {
+    editor?.commands.setContent(properties.jsonContent);
+  }
   const rect = useCursorVisibility({
     editor,
     overlayHeight: toolbarRef.current?.getBoundingClientRect().height ?? 0,

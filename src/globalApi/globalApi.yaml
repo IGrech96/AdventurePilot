@@ -45,6 +45,19 @@ api:
         args:
         - filePath: string
         return: string
+      invokeSaveItemImage:
+        channel: 'save-item-image'
+        args:
+        - node: SceneDefinition | OverviewDefinition
+        - imageName: string
+        - data: Uint8Array<ArrayBuffer>
+        return: string
+      invokeGetImageAsBase64:
+        channel: 'get-image-as-base64'
+        args:
+        - path: string
+        return: string
+
 
     application:
       sendSaveRequest:

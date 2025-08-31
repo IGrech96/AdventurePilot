@@ -11,12 +11,12 @@ import rehypeStringify from 'rehype-stringify';
 
 type suggestionData = { name: string, path: string };
 
-function convertToTipTapJson(plainText: string): JSONContent {
+async function convertToTipTapJson(plainText: string): Promise<JSONContent> {
   const tree = unified()
     .use(remarkParse)
     .parse(plainText);
 
-  const processed = toTipTap(tree);
+  const processed = await toTipTap(tree);
 
   const text = JSON.stringify(processed, null, 2);
 
@@ -26,6 +26,7 @@ function convertToTipTapJson(plainText: string): JSONContent {
 export default function MarkdownEditor({ plainText, node }: { plainText?: string, node?: SceneDefinition | OverviewDefinition }) {
 
   const [suggestions, setSuggestions] = useState<suggestionData[]>([])
+  const [jsonContent, setJsonContent] = useState<JSONContent | null>(null);
 
   const nodeRef = useRef<SceneDefinition | OverviewDefinition>(null);
   useEffect(() => {
@@ -69,6 +70,13 @@ export default function MarkdownEditor({ plainText, node }: { plainText?: string
     return () => window.applicationApi.application.unsubscribe_onSaveRequest(save);
   });
 
+  useEffect(() => {
+    const loadContent = async () => {
+      const result = await convertToTipTapJson(plainText ?? '');
+      setJsonContent(result);
+    };
+    loadContent();
+  }, [plainText]);
 
 
   const getPreview = async (filePath: string): Promise<string> => {
@@ -80,17 +88,38 @@ export default function MarkdownEditor({ plainText, node }: { plainText?: string
       .use(rehypeStringify)     // Serialize HAST to HTML
       .process(previewData);
 
-      return String(data);
+    return String(data);
+  }
+
+  const handleImageUpload = async (
+    file: File,
+    onProgress?: (event: { progress: number }) => void,
+    abortSignal?: AbortSignal
+  ): Promise<string> => {
+    // Validate file
+    if (!file) {
+      throw new Error("No file provided")
+    }
+
+    const node = nodeRef.current;
+    if (node) {
+      const name = file.name;
+      const bytes = new Uint8Array(await file.arrayBuffer())
+      return window.applicationApi.file.invokeSaveItemImage(node, name, bytes);
+    }
+
+    throw new Error('Unexpected error');
   }
 
   return (
     <>
       <SimpleEditor
         ref={editorRef}
-        jsonContent={convertToTipTapJson(plainText ?? '')}
+        jsonContent={jsonContent}
         onUpdate={onUpdate}
         Suggestions={suggestions}
         getPreview={getPreview}
+        uploadImage={handleImageUpload}
       />
     </>
   )

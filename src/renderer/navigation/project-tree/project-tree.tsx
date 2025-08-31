@@ -254,6 +254,7 @@ function ProjectTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHa
         selectedItems={selectedItem}
         onItemClick={handleItemClicked}
         onSelectedItemsChange={handleSelectedItemsChange}
+        expansionTrigger="iconContainer"
       />
     </Box>
   );

@@ -90,7 +90,7 @@ export default class Main {
 
     api.project.handleGetAvailableItems((event: any) => {
 
-      const locations : SceneDefinition[] = [];
+      const locations: SceneDefinition[] = [];
       const vist = (scenes: SceneDefinition[]) => {
         scenes.forEach(element => {
           locations.push(element);
@@ -108,6 +108,33 @@ export default class Main {
 
     api.file.handleGetFilePreview((event: any, filePath: string) => {
       let content = fs.readFileSync(path.join(projectFolder, filePath), 'utf8');
+      if (!content) {
+        content = ""
+      }
+      return content;
+    })
+
+    api.file.handleSaveItemImage((
+      event: any,
+      node: SceneDefinition | OverviewDefinition,
+      name: string,
+      data: Uint8Array<ArrayBuffer>) => {
+
+      const rootFolder = "images";
+      const subfolder = path.basename(node.file, path.extname(node.file))
+
+      const fullDirPath = path.join(projectFolder, rootFolder, subfolder);
+      const fullFilePath = path.join(fullDirPath, name);
+
+      if (!fs.existsSync(fullDirPath)) {
+        fs.mkdirSync(fullDirPath, { recursive: true });
+      }
+      fs.writeFileSync(fullFilePath, data, { flush: true });
+      return path.join('/', rootFolder, subfolder, name);
+    })
+
+    api.file.handleGetImageAsBase64((event: any, filePath: string) => {
+      let content = fs.readFileSync(path.join(projectFolder, filePath)).toString('base64');
       if (!content) {
         content = ""
       }

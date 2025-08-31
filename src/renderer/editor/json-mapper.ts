@@ -10,7 +10,7 @@ type attributeTransformation = {
 
 type nodeTransformation = {
   selector: (data: { sourceNode: JSONContent }) => boolean;
-  apply: (data: { sourceNode: JSONContent, targetNode: JSONContent }) => void;
+  apply: (data: { sourceNode: JSONContent, targetNode: JSONContent }) => void | Promise<void>;
 }
 
 const toTipTapAttributeTransformation: attributeTransformation[] = [
@@ -120,14 +120,41 @@ const toTipTapNodeTransformation: nodeTransformation[] = [
       data.sourceNode.children = undefined;
     }
   },
+  {
+    selector: (data) => data.sourceNode.type === 'image', apply: async (data) => {
+
+      const sourceSrc = data.sourceNode.url;
+      let src = sourceSrc;
+      const alt = data.sourceNode.alt;
+      const title = data.sourceNode.title;
+
+      if (src){
+        const encoded = await window.applicationApi.file.invokeGetImageAsBase64(src);
+        src = `data:image/jpg;base64,${encoded}`
+      }
+
+      data.targetNode.type = 'image';
+      data.targetNode.attrs ??= {};
+      data.targetNode.attrs.src = src;
+      data.targetNode.attrs.sourceSrc = sourceSrc;
+      data.targetNode.attrs.alt = alt;
+      data.targetNode.attrs.title = title;
+
+      data.sourceNode.children = undefined;
+    }
+  },
 ]
 
-export function toTipTap(content: JSONContent): JSONContent {
+export async function toTipTap(content: JSONContent): Promise<JSONContent> {
   const transformed: JSONContent = {}
 
   const nodeTransformation = toTipTapNodeTransformation.find(x => x.selector({ sourceNode: content }));
   if (nodeTransformation) {
-    nodeTransformation.apply({ sourceNode: content, targetNode: transformed })
+    const res = nodeTransformation.apply({ sourceNode: content, targetNode: transformed })
+    if (res instanceof Promise )
+    {
+      await res;
+    }
     return transformed;
   }
   for (const key in content) {
@@ -139,10 +166,10 @@ export function toTipTap(content: JSONContent): JSONContent {
     }
     let transformedValue;
     if (Array.isArray(value)) {
-      transformedValue = value.map(toTipTap)
+      transformedValue = await Promise.all(value.map(toTipTap))
     }
     else if (typeof value === 'object' && value !== null) {
-      transformedValue = toTipTap(value);
+      transformedValue = await toTipTap(value);
     }
     else {
       transformedValue = value;

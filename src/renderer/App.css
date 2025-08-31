@@ -2,6 +2,10 @@
   flex: 1;
   display: flex;
 }
+.gutter {
+  background-color: #1976d2; /* MUI primary blue */
+  cursor: col-resize;
+}
 /*
 .logo {
   height: 6em;

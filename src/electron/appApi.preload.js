@@ -45,6 +45,12 @@ contextBridge.exposeInMainWorld('applicationApi', {
         invokeGetFilePreview: (filePath) => {
             return ipcRenderer.invoke('get-file-preview', filePath);
         },
+        invokeSaveItemImage: (node, imageName, data) => {
+            return ipcRenderer.invoke('save-item-image', node, imageName, data);
+        },
+        invokeGetImageAsBase64: (path) => {
+            return ipcRenderer.invoke('get-image-as-base64', path);
+        },
     },
     application: {
         sendSaveRequest: () => {
