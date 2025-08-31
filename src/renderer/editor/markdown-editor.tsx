@@ -12,13 +12,13 @@ import remarkGfm from 'remark-gfm';
 
 type suggestionData = { name: string, path: string };
 
-async function convertToTipTapJson(plainText: string): Promise<JSONContent> {
+function convertToTipTapJson(plainText: string): JSONContent {
   const tree = unified()
     .use(remarkParse)
     .use(remarkGfm)
     .parse(plainText);
 
-  const processed = await toTipTap(tree);
+  const processed = toTipTap(tree, []);
 
   const text = JSON.stringify(processed, null, 2);
 
@@ -73,11 +73,8 @@ export default function MarkdownEditor({ plainText, node }: { plainText?: string
   });
 
   useEffect(() => {
-    const loadContent = async () => {
-      const result = await convertToTipTapJson(plainText ?? '');
+    const result = convertToTipTapJson(plainText ?? '');
       setJsonContent(result);
-    };
-    loadContent();
   }, [plainText]);
 
 

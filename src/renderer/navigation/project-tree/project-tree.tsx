@@ -22,7 +22,7 @@ type dragndropposition = "before" | "on" | "after";
 const initialItems: ProjectTreeViewItem[] = toTree(null);
 
 function ProjectTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHandle>) {
-  const [selectedItem, setSelectedItem] = React.useState<string>();
+  const [selectedItem, setSelectedItem] = React.useState<string|null>(null);
   const apiRef = useTreeViewApiRef();
 
   useImperativeHandle(ref, () => ({

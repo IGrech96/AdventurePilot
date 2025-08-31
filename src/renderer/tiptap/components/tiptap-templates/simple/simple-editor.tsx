@@ -76,7 +76,7 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
 import "@/components/tiptap-templates/simple/simple-editor.scss"
 
 import content from "@/components/tiptap-templates/simple/data/content2.json"
-import { forwardRef, useImperativeHandle } from "react"
+import { forwardRef, useEffect, useImperativeHandle } from "react"
 import { MarkdownFileLink } from "@/extensions/markdown-file-link/markdown-file-link"
 import { LocalImage } from "@/extensions/local-image/local-image"
 import { TableToolbar } from "@/extensions/table-toolbar/table-toolbar"
@@ -248,6 +248,9 @@ function SimpleEditor(properties: SimpleEditorProperties, ref: React.Ref<SimpleE
     onUpdate({ editor }) {
       properties.onUpdate();
     },
+    onContentError({ error }) {
+      console.error('Invalid content:', error);
+    },
     extensions: [
       StarterKit.configure({
         horizontalRule: false,
@@ -283,11 +286,17 @@ function SimpleEditor(properties: SimpleEditorProperties, ref: React.Ref<SimpleE
       }),
       TableKit
     ],
+    content: ''
   })
 
-  if (properties.jsonContent) {
-    editor?.commands.setContent(properties.jsonContent);
-  }
+  useEffect(() => {
+    if (editor && properties.jsonContent) {
+      queueMicrotask(() => {
+        editor.commands.setContent(properties.jsonContent);
+      });
+    }
+  }, [editor, properties.jsonContent])
+
   const rect = useCursorVisibility({
     editor,
     overlayHeight: toolbarRef.current?.getBoundingClientRect().height ?? 0,

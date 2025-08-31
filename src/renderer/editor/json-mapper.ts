@@ -10,7 +10,7 @@ type attributeTransformation = {
 
 type nodeTransformation = {
   selector: (data: { sourceNode: JSONContent }) => boolean;
-  apply: (data: { sourceNode: JSONContent, targetNode: JSONContent }) => void | Promise<void>;
+  apply: (data: { sourceNode: JSONContent, path: JSONContent[], targetNode: JSONContent }) => void;
 }
 
 const toTipTapAttributeTransformation: attributeTransformation[] = [
@@ -123,7 +123,7 @@ const toTipTapNodeTransformation: nodeTransformation[] = [
     }
   },
   {
-    selector: (data) => data.sourceNode.type === 'image', apply: async (data) => {
+    selector: (data) => data.sourceNode.type === 'image', apply: (data) => {
 
       const sourceSrc = data.sourceNode.url;
       let src = sourceSrc;
@@ -145,18 +145,39 @@ const toTipTapNodeTransformation: nodeTransformation[] = [
       data.sourceNode.children = undefined;
     }
   },
+  {
+    selector: (data) => data.sourceNode.type === 'tableCell', apply: (data) => {
+
+      if (data.sourceNode.children) {
+
+        const tableRowSource = data.path.at(-1);
+        const tableSource = data.path.at(-2);
+
+        let type = 'tableCell';
+        if (tableRowSource && tableSource) {
+          const rowIndex = tableSource.children.findIndex(x => x == tableRowSource);
+          if (rowIndex == 0){
+            type = 'tableHeader'
+          }
+        }
+        data.targetNode.type = type
+        data.targetNode.content = [
+          {
+            type: 'paragraph',
+            content: data.sourceNode.children.map(toTipTap)
+          }
+        ]
+      }
+    }
+  },
 ]
 
-export async function toTipTap(content: JSONContent): Promise<JSONContent> {
+export function toTipTap(content: JSONContent, path: JSONContent[]): JSONContent {
   const transformed: JSONContent = {}
 
   const nodeTransformation = toTipTapNodeTransformation.find(x => x.selector({ sourceNode: content }));
   if (nodeTransformation) {
-    const res = nodeTransformation.apply({ sourceNode: content, targetNode: transformed })
-    if (res instanceof Promise )
-    {
-      await res;
-    }
+    nodeTransformation.apply({ sourceNode: content, path: path, targetNode: transformed })
     return transformed;
   }
   for (const key in content) {
@@ -168,10 +189,10 @@ export async function toTipTap(content: JSONContent): Promise<JSONContent> {
     }
     let transformedValue;
     if (Array.isArray(value)) {
-      transformedValue = await Promise.all(value.map(toTipTap))
+      transformedValue = value.map(x => toTipTap(x, [...path, content]))
     }
     else if (typeof value === 'object' && value !== null) {
-      transformedValue = await toTipTap(value);
+      transformedValue = toTipTap(value, [...path, content]);
     }
     else {
       transformedValue = value;
