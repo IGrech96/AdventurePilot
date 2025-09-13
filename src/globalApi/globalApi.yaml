@@ -15,7 +15,7 @@ api:
         - node: ProjectTreeItem
       invokeGetAvailableItems:
         channel: 'get-available-items'
-        return: (OverviewDefinition | SceneDefinition | NpcDefinition | ArtifactDefinition)[]
+        return: (OverviewDefinition | SceneDefinition | NpcDefinition | CommonDefinition)[]
     file:
       sendOpenMarkdown:
         channel: 'open-markdown'
@@ -70,7 +70,7 @@ models:
   ProjectConfiguration:
     overview: OverviewDefinition
     scenes: SceneDefinition[]
-    artifacts: ArtifactDefinition[]
+    common: CommonDefinition
     npces: NpcDefinition[]
   SceneDefinition:
     name: string
@@ -79,7 +79,7 @@ models:
   OverviewDefinition:
     name: string
     file: string
-  ArtifactDefinition:
+  CommonDefinition:
     name: string
     file: string
   NpcDefinition:
@@ -94,7 +94,7 @@ enums:
   sourcetype:
     - OverviewDefinition
     - SceneDefinition
-    - ArtifactDefinition
+    - CommonDefinition
     - NpcDefinition
   nodetype:
     - reserved
@@ -103,5 +103,4 @@ enums:
     - location
     - npces-root
     - npc
-    - artifacts-root
-    - artifact
+    - common

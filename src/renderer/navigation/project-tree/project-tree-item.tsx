@@ -23,7 +23,7 @@ export function toTree(data: ProjectConfiguration | null): ProjectTreeViewItem[]
 
     return data;
   }
-  const extractother = (input: NpcDefinition[] | ArtifactDefinition[] | undefined | null, type: nodetype): ProjectTreeViewItem[] => {
+  const extractother = (input: NpcDefinition[] | CommonDefinition[] | undefined | null, type: nodetype): ProjectTreeViewItem[] => {
     if (!input) return [];
     const data: ProjectTreeViewItem[] = input.map(x => ({
       id: (iterator++).toString(),
@@ -40,7 +40,7 @@ export function toTree(data: ProjectConfiguration | null): ProjectTreeViewItem[]
       id: (iterator++).toString(), label: data?.overview?.name ?? "Adventure", type: 'overview', path: data?.overview?.file, source: data?.overview, children: [
         { id: (iterator++).toString(), label: "Locations", type: 'locations-root', children: extractLocations(data?.scenes) },
         { id: (iterator++).toString(), label: "NPCes", type: 'npces-root', children: extractother(data?.npces, 'npc') },
-        { id: (iterator++).toString(), label: "Artifacts", type: 'artifacts-root', children: extractother(data?.artifacts, 'artifact') },
+        { id: (iterator++).toString(), label: "Common", type: 'common', path: data?.common.file, source: data?.common },
       ]
     }
   ]

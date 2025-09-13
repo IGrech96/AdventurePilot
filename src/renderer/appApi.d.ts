@@ -9,7 +9,7 @@ declare global {
                 sendProjectItemClicked: (node: ProjectTreeItem) => void;
                 subscribe_onProjectItemClicked: (callback: (event: any, node: ProjectTreeItem) => void) => void;
                 unsubscribe_onProjectItemClicked: (callback: (event: any, node: ProjectTreeItem) => void) => void;
-                invokeGetAvailableItems: () => Promise<(OverviewDefinition | SceneDefinition | NpcDefinition | ArtifactDefinition)[]>;
+                invokeGetAvailableItems: () => Promise<(OverviewDefinition | SceneDefinition | NpcDefinition | CommonDefinition)[]>;
             },
             file: {
                 sendOpenMarkdown: (filePath: string, node: SceneDefinition | OverviewDefinition) => void;
@@ -33,7 +33,7 @@ declare global {
     export interface ProjectConfiguration {
         overview: OverviewDefinition;
         scenes: SceneDefinition[];
-        artifacts: ArtifactDefinition[];
+        common: CommonDefinition;
         npces: NpcDefinition[];
     }
     export interface SceneDefinition {
@@ -45,7 +45,7 @@ declare global {
         name: string;
         file: string;
     }
-    export interface ArtifactDefinition {
+    export interface CommonDefinition {
         name: string;
         file: string;
     }
@@ -62,7 +62,7 @@ declare global {
     export type sourcetype =
         "OverviewDefinition" |
         "SceneDefinition" |
-        "ArtifactDefinition" |
+        "CommonDefinition" |
         "NpcDefinition";
     export type nodetype =
         "reserved" |
@@ -71,6 +71,5 @@ declare global {
         "location" |
         "npces-root" |
         "npc" |
-        "artifacts-root" |
-        "artifact";
+        "common";
 }

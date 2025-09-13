@@ -155,7 +155,7 @@ const toTipTapNodeTransformation: nodeTransformation[] = [
 
         let type = 'tableCell';
         if (tableRowSource && tableSource) {
-          const rowIndex = tableSource.children.findIndex(x => x == tableRowSource);
+          const rowIndex = tableSource.children.findIndex( (x:any) => x == tableRowSource);
           if (rowIndex == 0){
             type = 'tableHeader'
           }

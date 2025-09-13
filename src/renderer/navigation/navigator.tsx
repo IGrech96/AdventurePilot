@@ -17,7 +17,7 @@ export default function Navigator() {
 
     useEffect(() => {
         const onItemOpen = (event: any, node: ProjectTreeItem) => {
-            if (node.type == 'overview' || node.type == 'location') {
+            if (node.type == 'overview' || node.type == 'location' || node.type == 'common') {
                 if (node.path && node.source) {
                     window.applicationApi.file.sendOpenMarkdown(node.path, node.source);
                 }

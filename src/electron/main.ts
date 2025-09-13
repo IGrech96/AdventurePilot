@@ -1,10 +1,10 @@
-import { app, BrowserWindow } from 'electron';
+import { BrowserWindow } from 'electron';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
-import fs from 'fs';
 import ConfigurationManager from './config.js';
-import { applicationApi, ArtifactDefinition, NpcDefinition, OverviewDefinition, ProjectTreeItem, SceneDefinition, sourcetype } from './appApi.js';
+import { applicationApi } from './appApi.js';
+import { ApiHandlers } from './api.handlers.js';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -59,87 +59,11 @@ export default class Main {
     mainWindow.webContents.on('did-finish-load', () => {
       if (config) {
         api.project.onProjectOpen(config);
+        const handlers = new ApiHandlers(projectFolder, config);
+
+        handlers.Subscribe(api);
       }
     });
-
-    api.file.receiveOpenMarkdown((event: any, filepath: string, node: SceneDefinition | OverviewDefinition) => {
-      let content = fs.readFileSync(path.join(projectFolder, filepath), 'utf8');
-      if (!content) {
-        content = ""
-      }
-      api.file.onMarkdownOpen(content, node);
-    });
-
-    api.file.receiveSaveMarkdown((event: any, content: string, node: SceneDefinition | OverviewDefinition) => {
-      fs.writeFileSync(path.join(projectFolder, node.file), content, {
-        encoding: 'utf-8'
-      });
-    });
-
-    api.project.receiveProjectItemClicked((event: any, node: ProjectTreeItem) => {
-      api.project.onProjectItemClicked(node);
-    });
-
-    api.file.receiveFileChanged((event: any, node: SceneDefinition | OverviewDefinition) => {
-      api.file.onFileChanged(node);
-    });
-
-    api.application.receiveSaveRequest((event: any) => {
-      api.application.onSaveRequest();
-    });
-
-    api.project.handleGetAvailableItems((event: any) => {
-
-      const locations: SceneDefinition[] = [];
-      const vist = (scenes: SceneDefinition[]) => {
-        scenes.forEach(element => {
-          locations.push(element);
-          if (element.scenes) {
-            vist(element.scenes);
-          }
-        });
-      }
-
-      vist(config?.scenes ?? []);
-      const result: (OverviewDefinition | SceneDefinition | NpcDefinition | ArtifactDefinition)[] = [...locations, ...config?.artifacts ?? [], ...config?.npces ?? []];
-
-      return result;
-    });
-
-    api.file.handleGetFilePreview((event: any, filePath: string) => {
-      let content = fs.readFileSync(path.join(projectFolder, filePath), 'utf8');
-      if (!content) {
-        content = ""
-      }
-      return content;
-    })
-
-    api.file.handleSaveItemImage((
-      event: any,
-      node: SceneDefinition | OverviewDefinition,
-      name: string,
-      data: Uint8Array<ArrayBuffer>) => {
-
-      const rootFolder = "images";
-      const subfolder = path.basename(node.file, path.extname(node.file))
-
-      const fullDirPath = path.join(projectFolder, rootFolder, subfolder);
-      const fullFilePath = path.join(fullDirPath, name);
-
-      if (!fs.existsSync(fullDirPath)) {
-        fs.mkdirSync(fullDirPath, { recursive: true });
-      }
-      fs.writeFileSync(fullFilePath, data, { flush: true });
-      return path.join('/', rootFolder, subfolder, name).replace(/\\/g, '/');
-    })
-
-    api.file.handleGetImageAsBase64((event: any, filePath: string) => {
-      let content = fs.readFileSync(path.join(projectFolder, filePath)).toString('base64');
-      if (!content) {
-        content = ""
-      }
-      return content;
-    })
   }
 
   public Save(): void {

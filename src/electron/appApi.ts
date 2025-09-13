@@ -14,7 +14,7 @@ export class applicationApi {
         onProjectItemClicked: (node: ProjectTreeItem) => {
             this.window.webContents.send('item-clicked', node);
         },
-        handleGetAvailableItems: (callback: (event: any, ) => (OverviewDefinition | SceneDefinition | NpcDefinition | ArtifactDefinition)[]) => {
+        handleGetAvailableItems: (callback: (event: any, ) => (OverviewDefinition | SceneDefinition | NpcDefinition | CommonDefinition)[]) => {
             ipcMain.handle('get-available-items', callback);
         },
     }
@@ -56,7 +56,7 @@ export class applicationApi {
 export interface ProjectConfiguration {
     overview: OverviewDefinition;
     scenes: SceneDefinition[];
-    artifacts: ArtifactDefinition[];
+    common: CommonDefinition;
     npces: NpcDefinition[];
 }
 export interface SceneDefinition {
@@ -68,7 +68,7 @@ export interface OverviewDefinition {
     name: string;
     file: string;
 }
-export interface ArtifactDefinition {
+export interface CommonDefinition {
     name: string;
     file: string;
 }
@@ -85,7 +85,7 @@ export interface ProjectTreeItem {
 export type sourcetype = 
     "OverviewDefinition" |
     "SceneDefinition" |
-    "ArtifactDefinition" |
+    "CommonDefinition" |
     "NpcDefinition";
 export type nodetype = 
     "reserved" |
@@ -94,5 +94,4 @@ export type nodetype =
     "location" |
     "npces-root" |
     "npc" |
-    "artifacts-root" |
-    "artifact";
+    "common";
