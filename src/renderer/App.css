@@ -2,6 +2,10 @@
   flex: 1;
   display: flex;
 }
+body {
+  height: 100vh;
+  overflow: hidden;
+}
 .gutter {
   background-color: #1976d2; /* MUI primary blue */
   cursor: col-resize;

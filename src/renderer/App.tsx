@@ -2,8 +2,9 @@ import './App.css'
 import Navigator from './navigation/navigator'
 import Split from 'react-split';
 import { Box, Paper, Typography } from '@mui/material';
-import MarkdownEditor from './editor/markdown-editor';
+import MarkdownEditor from './editor/markdown-editor/markdown-editor';
 import { useEffect, useState } from 'react';
+import DnDCharacterSheet from './editor/dnd-character-sheet/dnd-character-sheet';
 
 function App() {
 
@@ -12,7 +13,7 @@ function App() {
     node: OverviewDefinition | SceneDefinition;
   } | null>(null);
 
-  const onMarkdownOpen = (event: any, content: string, node: OverviewDefinition | SceneDefinition) => {
+  const onMarkdownOpen = (event: any, content: string, node: OverviewDefinition | SceneDefinition | NpcDefinition) => {
     setActiveMarkdown({ content: content, node: node });
   };
 
@@ -33,14 +34,14 @@ function App() {
         style={{ display: 'flex', flex: 1 }}
       >
         {/* Left Pane: Tree */}
-        <Box component={Paper} elevation={3} sx={{ display: 'flex', flexDirection: 'column', minWidth: 250, overflow: 'hidden' }}>
+        <Box component={Paper} elevation={3} sx={{ display: 'flex', flexDirection: 'column', minWidth: 250, overflow: 'auto' }}>
           <Navigator />
         </Box>
 
         {/* Right Pane: Working Area */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
-          <MarkdownEditor plainText={activeMarkdown?.content} node={activeMarkdown?.node} />
-          {/* Your main content goes here */}
+        <Box component={Paper} elevation={3} sx={{ display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
+          {/* <MarkdownEditor plainText={activeMarkdown?.content} node={activeMarkdown?.node} /> */}
+          <DnDCharacterSheet />
         </Box>
       </Split>
 

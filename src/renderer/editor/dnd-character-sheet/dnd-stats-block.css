@@ -1,0 +1,41 @@
+.stat-block {
+  width: 100px;
+  height: auto;
+}
+.stat-block .value {
+  align-content: center;
+  text-align: center;
+  font: 3em Nodesto Cyrillic;
+}
+.stat-block .property-name {
+  align-content: center;
+  text-align: center;
+}
+
+.stat-block-shield {
+  width: 100px;
+  height: 100px;
+  background-image: url('./icons/shield.svg');
+  background-size: cover;
+}
+
+.stat-block-octagon {
+  width: 100px;
+  height: 100px;
+  background-image: url('./icons/octagon.svg');
+  background-size: cover;
+}
+
+.stat-block-heart {
+  width: 100px;
+  height: 100px;
+  background-image: url('./icons/heart.svg');
+  background-size: cover;
+}
+
+.stat-block-chevron {
+  width: 100px;
+  height: 100px;
+  background-image: url('./icons/shield-protection.svg');
+  background-size: cover;
+}
