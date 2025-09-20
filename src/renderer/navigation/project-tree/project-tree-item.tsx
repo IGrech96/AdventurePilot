@@ -14,7 +14,7 @@ export function toTree(data: ProjectConfiguration | null): ProjectTreeViewItem[]
     const data: ProjectTreeViewItem[] = scenes.map(x => ({
       id: (iterator++).toString(),
       label: x.name,
-      type: 'location',
+      type: 'scene',
       source: x,
       children: extractLocations(x.scenes)
     }));
@@ -35,7 +35,7 @@ export function toTree(data: ProjectConfiguration | null): ProjectTreeViewItem[]
   return [
     {
       id: (iterator++).toString(), label: data?.overview?.name ?? "Adventure", type: 'overview', source: data?.overview, children: [
-        { id: (iterator++).toString(), label: "Locations", type: 'locations-root', children: extractLocations(data?.scenes) },
+        { id: (iterator++).toString(), label: "Locations", type: 'scenes-root', children: extractLocations(data?.scenes) },
         { id: (iterator++).toString(), label: "NPCes", type: 'npces-root', children: extractother(data?.npces, 'npc') },
         { id: (iterator++).toString(), label: "Common", type: 'common', source: data?.common },
       ]

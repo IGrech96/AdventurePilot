@@ -15,30 +15,30 @@ api:
         - node: ProjectTreeItem
       invokeGetAvailableItems:
         channel: 'get-available-items'
-        return: (sourcetype)[]
+        return: (IDefinition)[]
     file:
       sendOpenDefinition:
         channel: 'open-definition'
         args:
-        - node: sourcetype
+        - node: IDefinition
       ondefinitionOpen:
         channel: 'definition-opened'
         args:
         - content: string | null
-        - node: OverviewDefinition | SceneDefinition | NpcDefinition | CommonDefinition
+        - node: IDefinition
       sendSaveMarkdown:
         channel: 'save-markdown'
         args:
         - content: string
-        - node: SceneDefinition | OverviewDefinition | CommonDefinition
+        - node: IFileDefinition
       sendFileChanged:
         channel: 'file-changed'
         args:
-        - node: sourcetype
+        - node: IFileDefinition
       onFileChanged:
         channel: 'file-changed'
         args:
-        - node: sourcetype
+        - node: IFileDefinition
       invokeGetFilePreview:
         channel: 'get-file-preview'
         args:
@@ -47,7 +47,7 @@ api:
       invokeSaveItemImage:
         channel: 'save-item-image'
         args:
-        - node: sourcetype
+        - node: IDefinition
         - imageName: string
         - data: Uint8Array<ArrayBuffer>
         return: string
@@ -63,46 +63,3 @@ api:
         channel: 'invoke-save'
       onSaveRequest:
         channel: 'save-requested'
-
-
-models:
-  ProjectConfiguration:
-    overview: OverviewDefinition
-    scenes: SceneDefinition[]
-    common: CommonDefinition
-    npces: NpcDefinition[]
-  SceneDefinition:
-    type: "'scene'"
-    name: string
-    file: string
-    scenes: SceneDefinition[]
-  OverviewDefinition:
-    type: "'overview'"
-    name: string
-    file: string
-  CommonDefinition:
-    type: "'common'"
-    name: string
-    file: string
-  NpcDefinition:
-    type: "'npc'"
-    name: string
-
-  ProjectTreeItem:
-    children?: ProjectTreeItem[]
-    type: nodetype
-    source?: sourcetype
-enums:
-  sourcetype:
-    - OverviewDefinition
-    - SceneDefinition
-    - CommonDefinition
-    - NpcDefinition
-  nodetype:
-    - "'reserved'"
-    - "'overview'"
-    - "'locations-root'"
-    - "'location'"
-    - "'npces-root'"
-    - "'npc'"
-    - "'common'"

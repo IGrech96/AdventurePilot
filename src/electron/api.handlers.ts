@@ -1,4 +1,4 @@
-import { applicationApi, CommonDefinition, NpcDefinition, OverviewDefinition, ProjectConfiguration, ProjectTreeItem, SceneDefinition, sourcetype } from "./appApi.js";
+import { applicationApi, ProjectConfiguration, ProjectTreeItem, IDefinition, IFileDefinition, asFileDefinition, SceneDefinition, CommonDefinition } from "./appApi.js";
 import fs from 'fs';
 import path from 'path';
 
@@ -10,10 +10,11 @@ export class ApiHandlers {
 
   }
   public Subscribe(api: applicationApi) {
-    api.file.receiveOpenDefinition((event: any, node: SceneDefinition | OverviewDefinition | CommonDefinition | NpcDefinition) => {
+    api.file.receiveOpenDefinition((event: any, node: IDefinition) => {
       let content;
-      if ("file" in node) {
-        content = fs.readFileSync(path.join(this.projectFolder, node.file), 'utf8');
+      const fileDefinition = asFileDefinition(node);
+      if (fileDefinition) {
+        content = fs.readFileSync(path.join(this.projectFolder, fileDefinition.file), 'utf8');
       }
       if (!content) {
         content = ""
@@ -21,7 +22,7 @@ export class ApiHandlers {
       api.file.ondefinitionOpen(content, node);
     });
 
-    api.file.receiveSaveMarkdown((event: any, content: string, node: SceneDefinition | OverviewDefinition | CommonDefinition) => {
+    api.file.receiveSaveMarkdown((event: any, content: string, node: IFileDefinition) => {
       fs.writeFileSync(path.join(this.projectFolder, node.file), content, {
         encoding: 'utf-8'
       });
@@ -31,7 +32,7 @@ export class ApiHandlers {
       api.project.onProjectItemClicked(node);
     });
 
-    api.file.receiveFileChanged((event: any, node: sourcetype) => {
+    api.file.receiveFileChanged((event: any, node: IFileDefinition) => {
       api.file.onFileChanged(node);
     });
 
@@ -51,12 +52,14 @@ export class ApiHandlers {
 
     api.file.handleSaveItemImage((
       event: any,
-      node: sourcetype,
+      node: IDefinition,
       name: string,
       data: Uint8Array<ArrayBuffer>) => {
 
       const rootFolder = "images";
-      const subfolder = 'file' in node ? path.basename(node.file, path.extname(node.file)) : node.type
+      const fileDefinition = asFileDefinition(node);
+
+      const subfolder = fileDefinition ? path.basename(fileDefinition.file, path.extname(fileDefinition.file)) : node.type
 
       const fullDirPath = path.join(this.projectFolder, rootFolder, subfolder);
       const fullFilePath = path.join(fullDirPath, name);
@@ -77,7 +80,7 @@ export class ApiHandlers {
     })
   }
 
-  private handleGetAvailableItems(event: any): (OverviewDefinition | SceneDefinition | NpcDefinition | CommonDefinition)[] {
+  private handleGetAvailableItems(event: any): (IDefinition)[] {
     const locations: SceneDefinition[] = [];
     const vist = (scenes: SceneDefinition[]) => {
       scenes.forEach(element => {
@@ -90,7 +93,7 @@ export class ApiHandlers {
 
     vist(this.config?.scenes ?? []);
 
-    const result: (OverviewDefinition | SceneDefinition | NpcDefinition | CommonDefinition)[] = [
+    const result: (IDefinition)[] = [
       ...locations,
       ...this.config?.npces ?? []
     ];

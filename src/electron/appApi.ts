@@ -14,30 +14,30 @@ export class applicationApi {
         onProjectItemClicked: (node: ProjectTreeItem) => {
             this.window.webContents.send('item-clicked', node);
         },
-        handleGetAvailableItems: (callback: (event: any, ) => (sourcetype)[]) => {
+        handleGetAvailableItems: (callback: (event: any, ) => (IDefinition)[]) => {
             ipcMain.handle('get-available-items', callback);
         },
     }
     public file = {
-        receiveOpenDefinition: (callback: (event: any, node: sourcetype) => void) => {
+        receiveOpenDefinition: (callback: (event: any, node: IDefinition) => void) => {
             ipcMain.on('open-definition', callback);
         },
-        ondefinitionOpen: (content: string | null, node: OverviewDefinition | SceneDefinition | NpcDefinition | CommonDefinition) => {
+        ondefinitionOpen: (content: string | null, node: IDefinition) => {
             this.window.webContents.send('definition-opened', content, node);
         },
-        receiveSaveMarkdown: (callback: (event: any, content: string, node: SceneDefinition | OverviewDefinition | CommonDefinition) => void) => {
+        receiveSaveMarkdown: (callback: (event: any, content: string, node: IFileDefinition) => void) => {
             ipcMain.on('save-markdown', callback);
         },
-        receiveFileChanged: (callback: (event: any, node: sourcetype) => void) => {
+        receiveFileChanged: (callback: (event: any, node: IFileDefinition) => void) => {
             ipcMain.on('file-changed', callback);
         },
-        onFileChanged: (node: sourcetype) => {
+        onFileChanged: (node: IFileDefinition) => {
             this.window.webContents.send('file-changed', node);
         },
         handleGetFilePreview: (callback: (event: any, filePath: string) => string) => {
             ipcMain.handle('get-file-preview', callback);
         },
-        handleSaveItemImage: (callback: (event: any, node: sourcetype, imageName: string, data: Uint8Array<ArrayBuffer>) => string) => {
+        handleSaveItemImage: (callback: (event: any, node: IDefinition, imageName: string, data: Uint8Array<ArrayBuffer>) => string) => {
             ipcMain.handle('save-item-image', callback);
         },
         handleGetImageAsBase64: (callback: (event: any, path: string) => string) => {
@@ -53,47 +53,60 @@ export class applicationApi {
         },
     }
 }
+
+export interface IDefinition {
+  name: string
+  type: DefinitionType
+}
+
+export interface IFileDefinition {
+  file: string
+}
+
+export type DefinitionType = 'overview' | 'scene' | 'common' | 'npc'
+
 export interface ProjectConfiguration {
-    overview: OverviewDefinition;
-    scenes: SceneDefinition[];
-    common: CommonDefinition;
-    npces: NpcDefinition[];
+  overview: OverviewDefinition;
+  scenes: SceneDefinition[];
+  common: CommonDefinition;
+  npces: NpcDefinition[];
 }
-export interface SceneDefinition {
-    type: 'scene';
-    name: string;
-    file: string;
-    scenes: SceneDefinition[];
+export interface SceneDefinition extends IDefinition, IFileDefinition {
+  scenes: SceneDefinition[];
 }
-export interface OverviewDefinition {
-    type: 'overview';
-    name: string;
-    file: string;
+export interface OverviewDefinition extends IDefinition, IFileDefinition {
 }
-export interface CommonDefinition {
-    type: 'common';
-    name: string;
-    file: string;
+export interface CommonDefinition extends IDefinition, IFileDefinition {
 }
-export interface NpcDefinition {
-    type: 'npc';
-    name: string;
+export interface NpcDefinition extends IDefinition, IFileDefinition {
 }
 export interface ProjectTreeItem {
-    children?: ProjectTreeItem[];
-    type: nodetype;
-    source?: sourcetype;
+  children?: ProjectTreeItem[];
+  type: nodetype;
+  source?: IDefinition;
 }
-export type sourcetype = 
-    OverviewDefinition |
-    SceneDefinition |
-    CommonDefinition |
-    NpcDefinition;
-export type nodetype = 
-    'reserved' |
-    'overview' |
-    'locations-root' |
-    'location' |
-    'npces-root' |
-    'npc' |
-    'common';
+
+export type nodetype =
+  'reserved' |
+  'scenes-root' |
+  'npces-root' |
+  DefinitionType;
+
+export function asFileDefinition(object: unknown) : IFileDefinition | undefined {
+  const reference: IFileDefinition = {
+    file: ''
+  };
+
+  if (hasShape<IFileDefinition>(object, reference)){
+    return object as IFileDefinition
+  }
+
+  return undefined;
+}
+
+function hasShape<T extends object>(obj: unknown, shape: T): obj is T {
+  if (typeof obj !== 'object' || obj === null) return false;
+
+  const shapeKeys = Object.keys(shape);
+  return shapeKeys.every((key) => key in obj);
+}

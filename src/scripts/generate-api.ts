@@ -10,6 +10,9 @@ const declaration = args[1];
 const fileContents = fs.readFileSync(declaration, 'utf8');
 const data = yaml.load(fileContents) as any;
 
+const mContents = fs.readFileSync("src/globalApi/global.m.ts", 'utf8');
+const fContents = fs.readFileSync("src/globalApi/global.f.ts", 'utf8');
+
 // generate-preload.ts
 const preloadLines: string[] = [
   `const { contextBridge, ipcRenderer } = require('electron')`,
@@ -129,47 +132,53 @@ if (data && data.api) {
   rendererGlobalApi.push(`${indent(1)}}`)
 }
 
-if (data && data.models) {
-  const models = Object.keys(data.models);
 
-  models.forEach(modelName => {
-    rendererGlobalApi.push(`${indent(1)}export interface ${modelName} {`);
-    electronMainApi.push(`export interface ${modelName} {`);
+rendererGlobalApi.push(mContents);
+electronMainApi.push(mContents);
+electronMainApi.push(fContents);
 
-    const properties = Object.keys(data.models[modelName]);
+// if (data && data.models) {
+//   const models = Object.keys(data.models);
 
-    properties.forEach(element => {
-      rendererGlobalApi.push(`${indent(2)}${element}: ${data.models[modelName][element]};`);
-      electronMainApi.push(`${indent(1)}${element}: ${data.models[modelName][element]};`);
-    });
+//   models.forEach(modelName => {
+//     rendererGlobalApi.push(`${indent(1)}export interface ${modelName} {`);
+//     electronMainApi.push(`export interface ${modelName} {`);
 
-    rendererGlobalApi.push(`${indent(1)}}`);
-    electronMainApi.push(`}`);
-  });
-}
+//     const properties = Object.keys(data.models[modelName]);
 
-if (data && data.enums) {
-  const enums = Object.keys(data.enums);
+//     properties.forEach(element => {
+//       rendererGlobalApi.push(`${indent(2)}${element}: ${data.models[modelName][element]};`);
+//       electronMainApi.push(`${indent(1)}${element}: ${data.models[modelName][element]};`);
+//     });
 
-  enums.forEach(enumName => {
-    rendererGlobalApi.push(`${indent(1)}export type ${enumName} =`);
-    electronMainApi.push(`export type ${enumName} = `);
+//     rendererGlobalApi.push(`${indent(1)}}`);
+//     electronMainApi.push(`}`);
+//   });
+// }
 
-    const properties = Object.keys(data.enums[enumName]);
+// if (data && data.enums) {
+//   const enums = Object.keys(data.enums);
 
-    for (let index = 0; index < properties.length; index++) {
-      const elementName = properties[index];
-      const enumItem = data.enums[enumName][elementName];
+//   enums.forEach(enumName => {
+//     rendererGlobalApi.push(`${indent(1)}export type ${enumName} =`);
+//     electronMainApi.push(`export type ${enumName} = `);
 
-      const suffix = index == properties.length - 1 ? ';' : ' |'
+//     const properties = Object.keys(data.enums[enumName]);
 
-      rendererGlobalApi.push(`${indent(2)}${enumItem}${suffix}`);
-      electronMainApi.push(`${indent(1)}${enumItem}${suffix}`);
-    }
-  });
-}
+//     for (let index = 0; index < properties.length; index++) {
+//       const elementName = properties[index];
+//       const enumItem = data.enums[enumName][elementName];
+
+//       const suffix = index == properties.length - 1 ? ';' : ' |'
+
+//       rendererGlobalApi.push(`${indent(2)}${enumItem}${suffix}`);
+//       electronMainApi.push(`${indent(1)}${enumItem}${suffix}`);
+//     }
+//   });
+// }
 
 rendererGlobalApi.push("}");
+rendererGlobalApi.push(fContents);
 
 fs.writeFileSync('src/electron/appApi.preload.js', preloadLines.join('\n'))
 fs.writeFileSync('src/renderer/appApi.d.ts', rendererGlobalApi.join('\n'))

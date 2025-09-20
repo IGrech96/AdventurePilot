@@ -1,4 +1,5 @@
 import { suggestionData } from "@/components/tiptap-templates/simple/simple-editor";
+import { asFileDefinition } from "../../../appApi.d";
 
 export function createPopup(
   items: suggestionData[],
@@ -39,9 +40,10 @@ export function createOption(item: suggestionData): HTMLDivElement {
   nameAttribute.value = item.name;
   option.attributes.setNamedItem(nameAttribute);
 
-  if ('path' in item.node) {
+  const fileDefinition = asFileDefinition(item.node);
+  if (fileDefinition) {
     const pathAttribute = document.createAttribute('data-path');
-    pathAttribute.value = item.node.path as string;
+    pathAttribute.value = fileDefinition.file;
     option.attributes.setNamedItem(pathAttribute);
   }
 

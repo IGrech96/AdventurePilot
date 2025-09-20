@@ -9,18 +9,18 @@ declare global {
                 sendProjectItemClicked: (node: ProjectTreeItem) => void;
                 subscribe_onProjectItemClicked: (callback: (event: any, node: ProjectTreeItem) => void) => void;
                 unsubscribe_onProjectItemClicked: (callback: (event: any, node: ProjectTreeItem) => void) => void;
-                invokeGetAvailableItems: () => Promise<(sourcetype)[]>;
+                invokeGetAvailableItems: () => Promise<(IDefinition)[]>;
             },
             file: {
-                sendOpenDefinition: (node: sourcetype) => void;
-                subscribe_ondefinitionOpen: (callback: (event: any, content: string | null, node: OverviewDefinition | SceneDefinition | NpcDefinition | CommonDefinition) => void) => void;
-                unsubscribe_ondefinitionOpen: (callback: (event: any, content: string | null, node: OverviewDefinition | SceneDefinition | NpcDefinition | CommonDefinition) => void) => void;
-                sendSaveMarkdown: (content: string, node: SceneDefinition | OverviewDefinition | CommonDefinition) => void;
-                sendFileChanged: (node: sourcetype) => void;
-                subscribe_onFileChanged: (callback: (event: any, node: sourcetype) => void) => void;
-                unsubscribe_onFileChanged: (callback: (event: any, node: sourcetype) => void) => void;
+                sendOpenDefinition: (node: IDefinition) => void;
+                subscribe_ondefinitionOpen: (callback: (event: any, content: string | null, node: IDefinition) => void) => void;
+                unsubscribe_ondefinitionOpen: (callback: (event: any, content: string | null, node: IDefinition) => void) => void;
+                sendSaveMarkdown: (content: string, node: IFileDefinition) => void;
+                sendFileChanged: (node: IFileDefinition) => void;
+                subscribe_onFileChanged: (callback: (event: any, node: IFileDefinition) => void) => void;
+                unsubscribe_onFileChanged: (callback: (event: any, node: IFileDefinition) => void) => void;
                 invokeGetFilePreview: (filePath: string) => Promise<string>;
-                invokeSaveItemImage: (node: sourcetype, imageName: string, data: Uint8Array<ArrayBuffer>) => Promise<string>;
+                invokeSaveItemImage: (node: IDefinition, imageName: string, data: Uint8Array<ArrayBuffer>) => Promise<string>;
                 invokeGetImageAsBase64: (path: string) => Promise<string>;
             },
             application: {
@@ -30,48 +30,61 @@ declare global {
             },
         },
     }
-    export interface ProjectConfiguration {
-        overview: OverviewDefinition;
-        scenes: SceneDefinition[];
-        common: CommonDefinition;
-        npces: NpcDefinition[];
-    }
-    export interface SceneDefinition {
-        type: 'scene';
-        name: string;
-        file: string;
-        scenes: SceneDefinition[];
-    }
-    export interface OverviewDefinition {
-        type: 'overview';
-        name: string;
-        file: string;
-    }
-    export interface CommonDefinition {
-        type: 'common';
-        name: string;
-        file: string;
-    }
-    export interface NpcDefinition {
-        type: 'npc';
-        name: string;
-    }
-    export interface ProjectTreeItem {
-        children?: ProjectTreeItem[];
-        type: nodetype;
-        source?: sourcetype;
-    }
-    export type sourcetype =
-        OverviewDefinition |
-        SceneDefinition |
-        CommonDefinition |
-        NpcDefinition;
-    export type nodetype =
-        'reserved' |
-        'overview' |
-        'locations-root' |
-        'location' |
-        'npces-root' |
-        'npc' |
-        'common';
+
+export interface IDefinition {
+  name: string
+  type: DefinitionType
+}
+
+export interface IFileDefinition {
+  file: string
+}
+
+export type DefinitionType = 'overview' | 'scene' | 'common' | 'npc'
+
+export interface ProjectConfiguration {
+  overview: OverviewDefinition;
+  scenes: SceneDefinition[];
+  common: CommonDefinition;
+  npces: NpcDefinition[];
+}
+export interface SceneDefinition extends IDefinition, IFileDefinition {
+  scenes: SceneDefinition[];
+}
+export interface OverviewDefinition extends IDefinition, IFileDefinition {
+}
+export interface CommonDefinition extends IDefinition, IFileDefinition {
+}
+export interface NpcDefinition extends IDefinition, IFileDefinition {
+}
+export interface ProjectTreeItem {
+  children?: ProjectTreeItem[];
+  type: nodetype;
+  source?: IDefinition;
+}
+
+export type nodetype =
+  'reserved' |
+  'scenes-root' |
+  'npces-root' |
+  DefinitionType;
+
+}
+export function asFileDefinition(object: unknown) : IFileDefinition | undefined {
+  const reference: IFileDefinition = {
+    file: ''
+  };
+
+  if (hasShape<IFileDefinition>(object, reference)){
+    return object as IFileDefinition
+  }
+
+  return undefined;
+}
+
+function hasShape<T extends object>(obj: unknown, shape: T): obj is T {
+  if (typeof obj !== 'object' || obj === null) return false;
+
+  const shapeKeys = Object.keys(shape);
+  return shapeKeys.every((key) => key in obj);
 }
