@@ -7,13 +7,12 @@ import './suggestion-popup.css'
 import './markdown-file-link.css'
 import { match } from 'assert';
 import { Transaction } from '@tiptap/pm/state'
-
-type data = { name: string; path: string };
+import { suggestionData } from '@/components/tiptap-templates/simple/simple-editor'
 
 type MarkdownFileLinkOptions = {
-  getItems: () => data[];
+  getItems: () => suggestionData[];
   getPreview: (filePath: string) => Promise<string>;
-  suggestion: (props: { getItems: () => data[] }) => any;
+  suggestion: (props: { getItems: () => suggestionData[] }) => any;
 };
 
 function openPopupCallback(getPreview: (filePath: string) => Promise<string>): (event: MouseEvent) => any {
@@ -33,20 +32,26 @@ function openPopupCallback(getPreview: (filePath: string) => Promise<string>): (
   }
 }
 
-function getSuggestionItems(query: any, getItems: () => data[]) {
+function getSuggestionItems(query: any, getItems: () => suggestionData[]) {
   function distinctBy<T>(array: T[], keyFn: (item: T) => any): T[] {
     return array.filter(
       (item, index, self) =>
         index === self.findIndex((t) => keyFn(t) === keyFn(item))
     )
   }
-  const knownFiles: data[] = getItems();
+  const knownFiles: suggestionData[] = getItems();
   const result = knownFiles.filter(item => item.name.toLowerCase().includes(query.toLowerCase()));
-  result.push(...knownFiles.filter(item => item.path.toLowerCase().includes(query.toLowerCase())));
+  result.push(...knownFiles.filter(item => {
+    if ('path' in item.node) {
+      const path = item.node.path as string;
+      return path.toLowerCase().includes(query.toLowerCase())
+    }
+    return false;
+  }));
   return distinctBy(result, x => x.name).slice(0, 5);
 }
 
-function handleSuggestionCommand({ editor, range, props }: { editor: any, range: { from: number, to: number }, props: data }) {
+function handleSuggestionCommand({ editor, range, props }: { editor: any, range: { from: number, to: number }, props: { name: string, path?: string, type: string } }) {
 
   const cursorPosition = editor.state.selection.anchor as number;
 
@@ -63,6 +68,7 @@ function handleSuggestionCommand({ editor, range, props }: { editor: any, range:
       attrs: {
         href: props.path,
         text: props.name,
+        type: props.type
       },
     })
     .run()
@@ -72,12 +78,12 @@ function renderSuggestionPopup() {
   let popup: HTMLElement | null = null
   let currentCommand: ((props: any) => void) | null = null
   return {
-    onStart: ({ items, clientRect, command }: { items: data[], clientRect: any, command: any }) => {
+    onStart: ({ items, clientRect, command }: { items: suggestionData[], clientRect: any, command: any }) => {
       currentCommand = command
       popup = createPopup(items, clientRect?.());
     },
 
-    onUpdate: ({ items, clientRect }: { items: data[], clientRect: any }) => {
+    onUpdate: ({ items, clientRect }: { items: suggestionData[], clientRect: any }) => {
       if (!popup) return
       popup.innerHTML = ''
       items.forEach(item => {
@@ -128,7 +134,7 @@ export const MarkdownFileLink = Node.create<MarkdownFileLinkOptions>({
     return {
       getItems: () => [],
       getPreview: (filePath: string) => Promise.resolve(""),
-      suggestion: (props: { getItems: () => data[] }) => ({
+      suggestion: (props: { getItems: () => suggestionData[] }) => ({
         char: '#', // Trigger character
         match: /#([\w\-\/\.]+)/,
         getMatch: ({ textBeforeCursor }: { textBeforeCursor: any }) => {
@@ -146,7 +152,7 @@ export const MarkdownFileLink = Node.create<MarkdownFileLinkOptions>({
         items: ({ query }: { query: any }) => {
           return getSuggestionItems(query, props.getItems)
         },
-        command: ({ editor, range, props }: { editor: any, range: any, props: data }) => {
+        command: ({ editor, range, props }: { editor: any, range: any, props: { name: string, path?: string, type: string } }) => {
           handleSuggestionCommand({ editor, range, props })
         },
         allow: ({ state, range }: { state: any, range: any }) => true,

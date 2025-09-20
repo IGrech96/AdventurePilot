@@ -6,24 +6,40 @@ import MarkdownEditor from './editor/markdown-editor/markdown-editor';
 import { useEffect, useState } from 'react';
 import DnDCharacterSheet from './editor/dnd-character-sheet/dnd-character-sheet';
 
+type editorType = 'markdown' | 'character' | 'none'
+
 function App() {
 
-  const [activeMarkdown, setActiveMarkdown] = useState<{
-    content: string;
-    node: OverviewDefinition | SceneDefinition;
+  const getType = (def: sourcetype | undefined): editorType => {
+    if (!def) return 'none';
+    if (def.type == 'npc') return 'character';
+
+    return 'markdown';
+  }
+
+  const getMarkdownContent = (def: sourcetype | undefined): SceneDefinition | OverviewDefinition | CommonDefinition | undefined => {
+    if (getType(def) == 'markdown') {
+      return def as any;
+    }
+    return undefined;
+  }
+
+  const [activeDefinition, setActiveDefinition] = useState<{
+    content?: string;
+    node: sourcetype;
   } | null>(null);
 
-  const onMarkdownOpen = (event: any, content: string, node: OverviewDefinition | SceneDefinition | NpcDefinition) => {
-    setActiveMarkdown({ content: content, node: node });
+  const onDefinitionOpen = (event: any, content: string | null, node: sourcetype) => {
+    setActiveDefinition({ content: content ?? undefined, node: node });
   };
 
   useEffect(() => {
-    window.applicationApi.file.subscribe_onMarkdownOpen(onMarkdownOpen);
+    window.applicationApi.file.subscribe_ondefinitionOpen(onDefinitionOpen);
 
     return () => {
-      window.applicationApi.file.unsubscribe_onMarkdownOpen(onMarkdownOpen);
+      window.applicationApi.file.unsubscribe_ondefinitionOpen(onDefinitionOpen);
     }
-  }, [onMarkdownOpen]);
+  }, [onDefinitionOpen]);
 
   return (
     <>
@@ -40,8 +56,8 @@ function App() {
 
         {/* Right Pane: Working Area */}
         <Box component={Paper} elevation={3} sx={{ display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
-          {/* <MarkdownEditor plainText={activeMarkdown?.content} node={activeMarkdown?.node} /> */}
-          <DnDCharacterSheet />
+          { getType(activeDefinition?.node) == 'markdown' && <MarkdownEditor plainText={activeDefinition?.content} node={getMarkdownContent(activeDefinition?.node)} />}
+          { getType(activeDefinition?.node) == 'character' && <DnDCharacterSheet /> }
         </Box>
       </Split>
 

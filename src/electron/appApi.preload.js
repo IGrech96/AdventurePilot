@@ -21,14 +21,14 @@ contextBridge.exposeInMainWorld('applicationApi', {
         },
     },
     file: {
-        sendOpenMarkdown: (filePath, node) => {
-            ipcRenderer.send('open-markdown', filePath, node);
+        sendOpenDefinition: (node) => {
+            ipcRenderer.send('open-definition', node);
         },
-        subscribe_onMarkdownOpen: (callback) => {
-            ipcRenderer.on('markdown-opened', callback);
+        subscribe_ondefinitionOpen: (callback) => {
+            ipcRenderer.on('definition-opened', callback);
         },
-        unsubscribe_onMarkdownOpen: (callback) => {
-            ipcRenderer.removeListener('markdown-opened', callback);
+        unsubscribe_ondefinitionOpen: (callback) => {
+            ipcRenderer.removeListener('definition-opened', callback);
         },
         sendSaveMarkdown: (content, node) => {
             ipcRenderer.send('save-markdown', content, node);

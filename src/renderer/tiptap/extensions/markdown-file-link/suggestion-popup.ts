@@ -1,6 +1,7 @@
+import { suggestionData } from "@/components/tiptap-templates/simple/simple-editor";
 
 export function createPopup(
-  items: { name: string, path: string }[],
+  items: suggestionData[],
   clientRect: DOMRect | null
 ): HTMLElement {
 
@@ -29,19 +30,24 @@ export function createPopup(
   return popup;
 }
 
-export function createOption(item: { name: string, path: string }): HTMLDivElement {
+export function createOption(item: suggestionData): HTMLDivElement {
   const option = document.createElement('div')
   option.textContent = item.name
   option.classList.add('suggestion-popup-item');
 
   const nameAttribute = document.createAttribute('data-name');
   nameAttribute.value = item.name;
-
-  const pathAttribute = document.createAttribute('data-path');
-  pathAttribute.value = item.path;
-
   option.attributes.setNamedItem(nameAttribute);
-  option.attributes.setNamedItem(pathAttribute);
+
+  if ('path' in item.node) {
+    const pathAttribute = document.createAttribute('data-path');
+    pathAttribute.value = item.node.path as string;
+    option.attributes.setNamedItem(pathAttribute);
+  }
+
+  const typeAttribute = document.createAttribute('data-type');
+  typeAttribute.value = item.node.type;
+  option.attributes.setNamedItem(typeAttribute);
 
   return option;
 }
@@ -84,7 +90,8 @@ export function handleKeyDown(
     if (activeIndex >= 0 && currentCommand && options[activeIndex]) {
       const path = options[activeIndex].getAttribute('data-path');
       const name = options[activeIndex].getAttribute('data-name');
-      currentCommand({ name: name, path: path });
+      const type = options[activeIndex].getAttribute('data-type');
+      currentCommand({ name: name, path: path, type: type });
     }
     return true;
   }

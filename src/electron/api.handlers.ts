@@ -1,4 +1,4 @@
-import { applicationApi, CommonDefinition, NpcDefinition, OverviewDefinition, ProjectConfiguration, ProjectTreeItem, SceneDefinition } from "./appApi.js";
+import { applicationApi, CommonDefinition, NpcDefinition, OverviewDefinition, ProjectConfiguration, ProjectTreeItem, SceneDefinition, sourcetype } from "./appApi.js";
 import fs from 'fs';
 import path from 'path';
 
@@ -10,15 +10,18 @@ export class ApiHandlers {
 
   }
   public Subscribe(api: applicationApi) {
-    api.file.receiveOpenMarkdown((event: any, filepath: string, node: SceneDefinition | OverviewDefinition) => {
-      let content = fs.readFileSync(path.join(this.projectFolder, filepath), 'utf8');
+    api.file.receiveOpenDefinition((event: any, node: SceneDefinition | OverviewDefinition | CommonDefinition | NpcDefinition) => {
+      let content;
+      if ("file" in node) {
+        content = fs.readFileSync(path.join(this.projectFolder, node.file), 'utf8');
+      }
       if (!content) {
         content = ""
       }
-      api.file.onMarkdownOpen(content, node);
+      api.file.ondefinitionOpen(content, node);
     });
 
-    api.file.receiveSaveMarkdown((event: any, content: string, node: SceneDefinition | OverviewDefinition) => {
+    api.file.receiveSaveMarkdown((event: any, content: string, node: SceneDefinition | OverviewDefinition | CommonDefinition) => {
       fs.writeFileSync(path.join(this.projectFolder, node.file), content, {
         encoding: 'utf-8'
       });
@@ -28,7 +31,7 @@ export class ApiHandlers {
       api.project.onProjectItemClicked(node);
     });
 
-    api.file.receiveFileChanged((event: any, node: SceneDefinition | OverviewDefinition) => {
+    api.file.receiveFileChanged((event: any, node: sourcetype) => {
       api.file.onFileChanged(node);
     });
 
@@ -48,12 +51,12 @@ export class ApiHandlers {
 
     api.file.handleSaveItemImage((
       event: any,
-      node: SceneDefinition | OverviewDefinition,
+      node: sourcetype,
       name: string,
       data: Uint8Array<ArrayBuffer>) => {
 
       const rootFolder = "images";
-      const subfolder = path.basename(node.file, path.extname(node.file))
+      const subfolder = 'file' in node ? path.basename(node.file, path.extname(node.file)) : node.type
 
       const fullDirPath = path.join(this.projectFolder, rootFolder, subfolder);
       const fullFilePath = path.join(fullDirPath, name);
@@ -94,13 +97,15 @@ export class ApiHandlers {
 
     if (this.config.common && this.config.common.file) {
       const commonContent = fs.readFileSync(path.join(this.projectFolder, this.config.common.file), 'utf8');
-
+      const getCommonDef = (x: string): CommonDefinition => {
+        return { type: 'common', name: x, file: this.config.common.file };
+      }
       const sections = commonContent
-      .matchAll(/^#\s+([^\n]+)/gm)
-      .map(x => x[1]);
+        .matchAll(/^#\s+([^\n]+)/gm)
+        .map(x => x[1]);
 
 
-      result.push(...sections.map(x => { return {name: x, file: this.config.common.file} } ))
+      result.push(...sections.map(x => getCommonDef(x)))
     }
     return result;
   }

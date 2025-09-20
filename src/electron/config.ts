@@ -14,6 +14,7 @@ export default class ConfigurationManager {
             const defaultName = path.basename(path.dirname(projectFile));
             if (!data.overview){
                 data.overview = {
+                    type: 'overview',
                     file: "",
                     name: defaultName
                 };

@@ -14,30 +14,30 @@ export class applicationApi {
         onProjectItemClicked: (node: ProjectTreeItem) => {
             this.window.webContents.send('item-clicked', node);
         },
-        handleGetAvailableItems: (callback: (event: any, ) => (OverviewDefinition | SceneDefinition | NpcDefinition | CommonDefinition)[]) => {
+        handleGetAvailableItems: (callback: (event: any, ) => (sourcetype)[]) => {
             ipcMain.handle('get-available-items', callback);
         },
     }
     public file = {
-        receiveOpenMarkdown: (callback: (event: any, filePath: string, node: SceneDefinition | OverviewDefinition) => void) => {
-            ipcMain.on('open-markdown', callback);
+        receiveOpenDefinition: (callback: (event: any, node: sourcetype) => void) => {
+            ipcMain.on('open-definition', callback);
         },
-        onMarkdownOpen: (content: string, node: SceneDefinition | OverviewDefinition) => {
-            this.window.webContents.send('markdown-opened', content, node);
+        ondefinitionOpen: (content: string | null, node: OverviewDefinition | SceneDefinition | NpcDefinition | CommonDefinition) => {
+            this.window.webContents.send('definition-opened', content, node);
         },
-        receiveSaveMarkdown: (callback: (event: any, content: string, node: SceneDefinition | OverviewDefinition) => void) => {
+        receiveSaveMarkdown: (callback: (event: any, content: string, node: SceneDefinition | OverviewDefinition | CommonDefinition) => void) => {
             ipcMain.on('save-markdown', callback);
         },
-        receiveFileChanged: (callback: (event: any, node: SceneDefinition | OverviewDefinition) => void) => {
+        receiveFileChanged: (callback: (event: any, node: sourcetype) => void) => {
             ipcMain.on('file-changed', callback);
         },
-        onFileChanged: (node: SceneDefinition | OverviewDefinition) => {
+        onFileChanged: (node: sourcetype) => {
             this.window.webContents.send('file-changed', node);
         },
         handleGetFilePreview: (callback: (event: any, filePath: string) => string) => {
             ipcMain.handle('get-file-preview', callback);
         },
-        handleSaveItemImage: (callback: (event: any, node: SceneDefinition | OverviewDefinition, imageName: string, data: Uint8Array<ArrayBuffer>) => string) => {
+        handleSaveItemImage: (callback: (event: any, node: sourcetype, imageName: string, data: Uint8Array<ArrayBuffer>) => string) => {
             ipcMain.handle('save-item-image', callback);
         },
         handleGetImageAsBase64: (callback: (event: any, path: string) => string) => {
@@ -60,38 +60,40 @@ export interface ProjectConfiguration {
     npces: NpcDefinition[];
 }
 export interface SceneDefinition {
+    type: 'scene';
     name: string;
     file: string;
     scenes: SceneDefinition[];
 }
 export interface OverviewDefinition {
+    type: 'overview';
     name: string;
     file: string;
 }
 export interface CommonDefinition {
+    type: 'common';
     name: string;
     file: string;
 }
 export interface NpcDefinition {
+    type: 'npc';
     name: string;
-    file: string;
 }
 export interface ProjectTreeItem {
     children?: ProjectTreeItem[];
-    path?: string;
     type: nodetype;
-    source?: OverviewDefinition | SceneDefinition;
+    source?: sourcetype;
 }
 export type sourcetype = 
-    "OverviewDefinition" |
-    "SceneDefinition" |
-    "CommonDefinition" |
-    "NpcDefinition";
+    OverviewDefinition |
+    SceneDefinition |
+    CommonDefinition |
+    NpcDefinition;
 export type nodetype = 
-    "reserved" |
-    "overview" |
-    "locations-root" |
-    "location" |
-    "npces-root" |
-    "npc" |
-    "common";
+    'reserved' |
+    'overview' |
+    'locations-root' |
+    'location' |
+    'npces-root' |
+    'npc' |
+    'common';

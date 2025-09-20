@@ -1,4 +1,4 @@
-import { SimpleEditorHandle } from '@/components/tiptap-templates/simple/simple-editor'
+import { SimpleEditorHandle, suggestionData } from '@/components/tiptap-templates/simple/simple-editor'
 import SimpleEditor from '@/components/tiptap-templates/simple/simple-editor'
 import './markdown-editor.css'
 import { unified } from 'unified';
@@ -10,7 +10,6 @@ import remarkRehype from 'remark-rehype';
 import rehypeStringify from 'rehype-stringify';
 import remarkGfm from 'remark-gfm';
 
-type suggestionData = { name: string, path: string };
 
 function convertToTipTapJson(plainText: string): JSONContent {
   const tree = unified()
@@ -25,12 +24,12 @@ function convertToTipTapJson(plainText: string): JSONContent {
   return processed;
 }
 
-export default function MarkdownEditor({ plainText, node }: { plainText?: string, node?: SceneDefinition | OverviewDefinition }) {
+export default function MarkdownEditor({ plainText, node }: { plainText?: string, node?: SceneDefinition | OverviewDefinition | CommonDefinition }) {
 
   const [suggestions, setSuggestions] = useState<suggestionData[]>([])
   const [jsonContent, setJsonContent] = useState<JSONContent | null>(null);
 
-  const nodeRef = useRef<SceneDefinition | OverviewDefinition>(null);
+  const nodeRef = useRef<SceneDefinition | OverviewDefinition | CommonDefinition>(null);
   useEffect(() => {
     if (node) {
       nodeRef.current = node;
@@ -43,7 +42,7 @@ export default function MarkdownEditor({ plainText, node }: { plainText?: string
       .project
       .invokeGetAvailableItems()
       .then(data => {
-        const newData = data.map(x => ({ name: x.name, path: x.file }));
+        const newData = data.map(x => ({ name: x.name, node: x }));
         suggestions.length = 0;
         suggestions.push(...newData);
       }

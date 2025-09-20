@@ -163,8 +163,8 @@ if (data && data.enums) {
 
       const suffix = index == properties.length - 1 ? ';' : ' |'
 
-      rendererGlobalApi.push(`${indent(2)}"${enumItem}"${suffix}`);
-      electronMainApi.push(`${indent(1)}"${enumItem}"${suffix}`);
+      rendererGlobalApi.push(`${indent(2)}${enumItem}${suffix}`);
+      electronMainApi.push(`${indent(1)}${enumItem}${suffix}`);
     }
   });
 }

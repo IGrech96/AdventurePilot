@@ -9,18 +9,18 @@ declare global {
                 sendProjectItemClicked: (node: ProjectTreeItem) => void;
                 subscribe_onProjectItemClicked: (callback: (event: any, node: ProjectTreeItem) => void) => void;
                 unsubscribe_onProjectItemClicked: (callback: (event: any, node: ProjectTreeItem) => void) => void;
-                invokeGetAvailableItems: () => Promise<(OverviewDefinition | SceneDefinition | NpcDefinition | CommonDefinition)[]>;
+                invokeGetAvailableItems: () => Promise<(sourcetype)[]>;
             },
             file: {
-                sendOpenMarkdown: (filePath: string, node: SceneDefinition | OverviewDefinition) => void;
-                subscribe_onMarkdownOpen: (callback: (event: any, content: string, node: SceneDefinition | OverviewDefinition) => void) => void;
-                unsubscribe_onMarkdownOpen: (callback: (event: any, content: string, node: SceneDefinition | OverviewDefinition) => void) => void;
-                sendSaveMarkdown: (content: string, node: SceneDefinition | OverviewDefinition) => void;
-                sendFileChanged: (node: SceneDefinition | OverviewDefinition) => void;
-                subscribe_onFileChanged: (callback: (event: any, node: SceneDefinition | OverviewDefinition) => void) => void;
-                unsubscribe_onFileChanged: (callback: (event: any, node: SceneDefinition | OverviewDefinition) => void) => void;
+                sendOpenDefinition: (node: sourcetype) => void;
+                subscribe_ondefinitionOpen: (callback: (event: any, content: string | null, node: OverviewDefinition | SceneDefinition | NpcDefinition | CommonDefinition) => void) => void;
+                unsubscribe_ondefinitionOpen: (callback: (event: any, content: string | null, node: OverviewDefinition | SceneDefinition | NpcDefinition | CommonDefinition) => void) => void;
+                sendSaveMarkdown: (content: string, node: SceneDefinition | OverviewDefinition | CommonDefinition) => void;
+                sendFileChanged: (node: sourcetype) => void;
+                subscribe_onFileChanged: (callback: (event: any, node: sourcetype) => void) => void;
+                unsubscribe_onFileChanged: (callback: (event: any, node: sourcetype) => void) => void;
                 invokeGetFilePreview: (filePath: string) => Promise<string>;
-                invokeSaveItemImage: (node: SceneDefinition | OverviewDefinition, imageName: string, data: Uint8Array<ArrayBuffer>) => Promise<string>;
+                invokeSaveItemImage: (node: sourcetype, imageName: string, data: Uint8Array<ArrayBuffer>) => Promise<string>;
                 invokeGetImageAsBase64: (path: string) => Promise<string>;
             },
             application: {
@@ -37,39 +37,41 @@ declare global {
         npces: NpcDefinition[];
     }
     export interface SceneDefinition {
+        type: 'scene';
         name: string;
         file: string;
         scenes: SceneDefinition[];
     }
     export interface OverviewDefinition {
+        type: 'overview';
         name: string;
         file: string;
     }
     export interface CommonDefinition {
+        type: 'common';
         name: string;
         file: string;
     }
     export interface NpcDefinition {
+        type: 'npc';
         name: string;
-        file: string;
     }
     export interface ProjectTreeItem {
         children?: ProjectTreeItem[];
-        path?: string;
         type: nodetype;
-        source?: OverviewDefinition | SceneDefinition;
+        source?: sourcetype;
     }
     export type sourcetype =
-        "OverviewDefinition" |
-        "SceneDefinition" |
-        "CommonDefinition" |
-        "NpcDefinition";
+        OverviewDefinition |
+        SceneDefinition |
+        CommonDefinition |
+        NpcDefinition;
     export type nodetype =
-        "reserved" |
-        "overview" |
-        "locations-root" |
-        "location" |
-        "npces-root" |
-        "npc" |
-        "common";
+        'reserved' |
+        'overview' |
+        'locations-root' |
+        'location' |
+        'npces-root' |
+        'npc' |
+        'common';
 }

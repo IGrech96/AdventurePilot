@@ -3,9 +3,8 @@ import { TreeViewDefaultItemModelProperties } from "@mui/x-tree-view";
 
 export type ProjectTreeViewItem<R extends {} = TreeViewDefaultItemModelProperties> = R & {
   children?: ProjectTreeViewItem<R>[];
-  path?: string;
   type: nodetype;
-  source?: OverviewDefinition | SceneDefinition
+  source?: OverviewDefinition | SceneDefinition | CommonDefinition | NpcDefinition
 };
 
 export function toTree(data: ProjectConfiguration | null): ProjectTreeViewItem[] {
@@ -16,7 +15,6 @@ export function toTree(data: ProjectConfiguration | null): ProjectTreeViewItem[]
       id: (iterator++).toString(),
       label: x.name,
       type: 'location',
-      path: x.file,
       source: x,
       children: extractLocations(x.scenes)
     }));
@@ -29,7 +27,6 @@ export function toTree(data: ProjectConfiguration | null): ProjectTreeViewItem[]
       id: (iterator++).toString(),
       label: x.name,
       type: type,
-      path: x.file,
       source: x,
     }));
 
@@ -37,10 +34,10 @@ export function toTree(data: ProjectConfiguration | null): ProjectTreeViewItem[]
   }
   return [
     {
-      id: (iterator++).toString(), label: data?.overview?.name ?? "Adventure", type: 'overview', path: data?.overview?.file, source: data?.overview, children: [
+      id: (iterator++).toString(), label: data?.overview?.name ?? "Adventure", type: 'overview', source: data?.overview, children: [
         { id: (iterator++).toString(), label: "Locations", type: 'locations-root', children: extractLocations(data?.scenes) },
         { id: (iterator++).toString(), label: "NPCes", type: 'npces-root', children: extractother(data?.npces, 'npc') },
-        { id: (iterator++).toString(), label: "Common", type: 'common', path: data?.common.file, source: data?.common },
+        { id: (iterator++).toString(), label: "Common", type: 'common', source: data?.common },
       ]
     }
   ]

@@ -15,31 +15,30 @@ api:
         - node: ProjectTreeItem
       invokeGetAvailableItems:
         channel: 'get-available-items'
-        return: (OverviewDefinition | SceneDefinition | NpcDefinition | CommonDefinition)[]
+        return: (sourcetype)[]
     file:
-      sendOpenMarkdown:
-        channel: 'open-markdown'
+      sendOpenDefinition:
+        channel: 'open-definition'
         args:
-        - filePath: string
-        - node: SceneDefinition | OverviewDefinition
-      onMarkdownOpen:
-        channel: 'markdown-opened'
+        - node: sourcetype
+      ondefinitionOpen:
+        channel: 'definition-opened'
         args:
-        - content: string
-        - node: SceneDefinition | OverviewDefinition
+        - content: string | null
+        - node: OverviewDefinition | SceneDefinition | NpcDefinition | CommonDefinition
       sendSaveMarkdown:
         channel: 'save-markdown'
         args:
         - content: string
-        - node: SceneDefinition | OverviewDefinition
+        - node: SceneDefinition | OverviewDefinition | CommonDefinition
       sendFileChanged:
         channel: 'file-changed'
         args:
-        - node: SceneDefinition | OverviewDefinition
+        - node: sourcetype
       onFileChanged:
         channel: 'file-changed'
         args:
-        - node: SceneDefinition | OverviewDefinition
+        - node: sourcetype
       invokeGetFilePreview:
         channel: 'get-file-preview'
         args:
@@ -48,7 +47,7 @@ api:
       invokeSaveItemImage:
         channel: 'save-item-image'
         args:
-        - node: SceneDefinition | OverviewDefinition
+        - node: sourcetype
         - imageName: string
         - data: Uint8Array<ArrayBuffer>
         return: string
@@ -73,23 +72,26 @@ models:
     common: CommonDefinition
     npces: NpcDefinition[]
   SceneDefinition:
+    type: "'scene'"
     name: string
     file: string
     scenes: SceneDefinition[]
   OverviewDefinition:
+    type: "'overview'"
     name: string
     file: string
   CommonDefinition:
+    type: "'common'"
     name: string
     file: string
   NpcDefinition:
+    type: "'npc'"
     name: string
-    file: string
+
   ProjectTreeItem:
     children?: ProjectTreeItem[]
-    path?: string
     type: nodetype
-    source?: OverviewDefinition | SceneDefinition
+    source?: sourcetype
 enums:
   sourcetype:
     - OverviewDefinition
@@ -97,10 +99,10 @@ enums:
     - CommonDefinition
     - NpcDefinition
   nodetype:
-    - reserved
-    - overview
-    - locations-root
-    - location
-    - npces-root
-    - npc
-    - common
+    - "'reserved'"
+    - "'overview'"
+    - "'locations-root'"
+    - "'location'"
+    - "'npces-root'"
+    - "'npc'"
+    - "'common'"

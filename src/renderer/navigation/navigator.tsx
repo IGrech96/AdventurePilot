@@ -17,16 +17,16 @@ export default function Navigator() {
 
     useEffect(() => {
         const onItemOpen = (event: any, node: ProjectTreeItem) => {
-            if (node.type == 'overview' || node.type == 'location' || node.type == 'common') {
-                if (node.path && node.source) {
-                    window.applicationApi.file.sendOpenMarkdown(node.path, node.source);
+            if (node.type == 'overview' || node.type == 'location' || node.type == 'common' || node.type == 'npc') {
+                if (node.source) {
+                    window.applicationApi.file.sendOpenDefinition(node.source);
                 }
             }
 
             setCanCreateNewNode(node.type == "location" || node.type == 'locations-root');
             setCanSave(false);
         }
-        const onItemChanged = (event: any, node: OverviewDefinition | SceneDefinition) => {
+        const onItemChanged = (event: any, node: sourcetype) => {
             setCanSave(true);
         }
         const onSaved = (event: any) => {

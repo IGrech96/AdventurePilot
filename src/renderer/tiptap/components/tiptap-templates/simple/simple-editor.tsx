@@ -195,8 +195,7 @@ const MobileToolbarContent = ({
   </>
 )
 
-
-type suggestionData = { name: string, path: string };
+export type suggestionData = { name: string, node: sourcetype };
 
 type SimpleEditorProperties = {
   jsonContent: JSONContent | null;
