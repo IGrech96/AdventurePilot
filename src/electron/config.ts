@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
-import { ProjectConfiguration } from './appApi.js';
+import { ProjectConfiguration, SceneDefinition } from './appApi.js';
 
 export default class ConfigurationManager {
 
@@ -23,6 +23,18 @@ export default class ConfigurationManager {
             {
                 data.overview.name = defaultName;
             }
+
+            data.common.type = 'common';
+            data.overview.type = 'overview';
+
+            data.npces.forEach(n => n.type = 'npc');
+            const visitScens = (def: SceneDefinition) => {
+              def.type = 'scene';
+              def.scenes?.forEach(s => visitScens(s));
+            }
+
+            data.scenes.forEach(s => visitScens(s));
+
             return data;
         } catch (e) {
             console.error('Error reading or parsing YAML:', e);
