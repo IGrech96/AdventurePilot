@@ -3,7 +3,8 @@
   height: auto;
 }
 .stat-block .value {
-  align-content: center;
+  padding-top: 15%;
+  /* align-content: center; */
   text-align: center;
   font: 3em Nodesto Cyrillic;
 }

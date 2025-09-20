@@ -1,6 +1,8 @@
 export function asFileDefinition(object: unknown) : IFileDefinition | undefined {
   const reference: IFileDefinition = {
-    file: ''
+    file: '',
+    name: '',
+    type: 'common'
   };
 
   if (hasShape<IFileDefinition>(object, reference)){

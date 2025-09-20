@@ -13,8 +13,8 @@ declare global {
             },
             file: {
                 sendOpenDefinition: (node: IDefinition) => void;
-                subscribe_ondefinitionOpen: (callback: (event: any, content: string | null, node: IDefinition) => void) => void;
-                unsubscribe_ondefinitionOpen: (callback: (event: any, content: string | null, node: IDefinition) => void) => void;
+                subscribe_ondefinitionOpen: (callback: (event: any, content: any | null, node: IDefinition) => void) => void;
+                unsubscribe_ondefinitionOpen: (callback: (event: any, content: any | null, node: IDefinition) => void) => void;
                 sendSaveMarkdown: (content: string, node: IFileDefinition) => void;
                 sendFileChanged: (node: IFileDefinition) => void;
                 subscribe_onFileChanged: (callback: (event: any, node: IFileDefinition) => void) => void;
@@ -36,7 +36,7 @@ export interface IDefinition {
   type: DefinitionType
 }
 
-export interface IFileDefinition {
+export interface IFileDefinition extends IDefinition {
   file: string
 }
 
@@ -56,6 +56,8 @@ export interface OverviewDefinition extends IDefinition, IFileDefinition {
 export interface CommonDefinition extends IDefinition, IFileDefinition {
 }
 export interface NpcDefinition extends IDefinition, IFileDefinition {
+  engine: string
+  attributes: any
 }
 export interface ProjectTreeItem {
   children?: ProjectTreeItem[];
@@ -72,7 +74,9 @@ export type nodetype =
 }
 export function asFileDefinition(object: unknown) : IFileDefinition | undefined {
   const reference: IFileDefinition = {
-    file: ''
+    file: '',
+    name: '',
+    type: 'common'
   };
 
   if (hasShape<IFileDefinition>(object, reference)){

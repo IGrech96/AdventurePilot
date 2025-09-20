@@ -1,71 +1,90 @@
 import React from 'react';
 import './dnd-character-sheet.css';
 import DnDStatsBlock from './dnd-stats-block';
+import { CharacterSheet as DnDCharacterSheetModel } from './dnd-character-sheet-model';
 
-const DnDCharacterSheet: React.FC = () => {
+export type DnDCharacterSheetProperties = {
+  name?: string
+  model?: DnDCharacterSheetModel
+}
+
+export default function DnDCharacterSheet(props: DnDCharacterSheetProperties) {
+
   return (
     <div className="sheet-container">
       <header className="sheet-header">
-        <h1>🎸 Роленрок Метал</h1>
-        <h2>Сатир, Бард</h2>
+        <h1>{props.name}</h1>
+        <h2>{props.model?.race}, {props.model?.class}</h2>
       </header>
 
       <div className='sheet-2side'>
         <div>
           <section className="stats-grid">
-            <DnDStatsBlock name='Класс Брони' value={14} shape='shield' />
-            <DnDStatsBlock name='Скорость' value={35} shape='octagon' />
-            <DnDStatsBlock name='Мак Здоровье' value={32} shape='heart' />
-            <DnDStatsBlock name='Тек. Здоровье' value={32} shape='heart' />
+            <DnDStatsBlock name='Класс Брони' value={props.model?.combat.armorClass} shape='shield' />
+            <DnDStatsBlock name='Скорость' value={props.model?.combat.speed} shape='octagon' />
+            <DnDStatsBlock name='Мак Здоровье' value={props.model?.combat.hitPoints?.max} shape='heart' />
+            <DnDStatsBlock name='Тек. Здоровье' value={props.model?.combat.hitPoints?.current} shape='heart' />
           </section>
         </div>
         <div>
           <section className="mod-grid">
-            <DnDStatsBlock name='СИЛ' value={0} shape='chevron' modificator={true} />
-            <DnDStatsBlock name='ЛОВ' value={3} shape='chevron' modificator={true} />
-            <DnDStatsBlock name='ТЕЛ' value={1} shape='chevron' modificator={true} />
-            <DnDStatsBlock name='ИНТ' value={-2} shape='chevron' modificator={true} />
-            <DnDStatsBlock name='МДР' value={0} shape='chevron' modificator={true} />
-            <DnDStatsBlock name='ХАР' value={3} shape='chevron' modificator={true} />
+            <DnDStatsBlock name='СИЛ' value={props.model?.abilityScores.strength} shape='chevron' modificator={true} mark={props.model?.savingThrows?.strength} />
+            <DnDStatsBlock name='ЛОВ' value={props.model?.abilityScores.dexterity} shape='chevron' modificator={true} mark={props.model?.savingThrows?.dexterity} />
+            <DnDStatsBlock name='ТЕЛ' value={props.model?.abilityScores.constitution} shape='chevron' modificator={true} mark={props.model?.savingThrows?.constitution} />
+            <DnDStatsBlock name='ИНТ' value={props.model?.abilityScores.intelligence} shape='chevron' modificator={true} mark={props.model?.savingThrows?.intelligence} />
+            <DnDStatsBlock name='МДР' value={props.model?.abilityScores.wisdom} shape='chevron' modificator={true} mark={props.model?.savingThrows?.wisdom} />
+            <DnDStatsBlock name='ХАР' value={props.model?.abilityScores.charisma} shape='chevron' modificator={true} mark={props.model?.savingThrows?.charisma} />
           </section>
           <div className="stuff-grid">
             <section className="equipment">
               <h3>Снаряжение</h3>
               <ul>
-                <li>Рапира (+5 атака, 1d8+3 урон)</li>
-                <li>Кожаная броня</li>
-                <li>Набор для маскировки</li>
-                <li>Мандолина</li>
-                <li>Мешочек с 46 зубами</li>
+                {
+                    props.model?.equipment.map((item, index) => {
+                      const count = item.quantity > 1 ? `(x${item.quantity})` : ''
+                      const separator = item.description ? ': ' : ''
+                      return (
+                        <li key={index}>{item.name}{count}{separator}{item.description}</li>
+                      );
+                    })
+                }
               </ul>
             </section>
             <section className="abilities">
               <h3>Способности</h3>
               <ul>
-                <li>Экспертиза: двойной бонус мастерства</li>
-                <li>Вдохновение барда (3 раза): d6 бонус союзнику</li>
-                <li>Песнь отдыха: +1d6 HP при коротком отдыхе</li>
-                <li>На все руки мастер: +1 к не-мастерским проверкам</li>
-                <li>Магия: ХАР-базовая, DC 13, атака +5</li>
+                {
+                    props.model?.featuresAndTraits.map((item, index) => {
+                      const separator = item.description ? ': ' : ''
+                      return (
+                        <li key={index}>{item.name}{separator}{item.description}</li>
+                      );
+                    })
+                }
               </ul>
             </section>
             <section className="proficiencies">
               <h3>Владения и навыки</h3>
               <ul>
-                <li>Спасброски: Ловкость +, Харизма +</li>
-                <li>Владение оружием: Рапира +5</li>
-                <li>Выступление +5</li>
-                <li>Обман +5</li>
-                <li>Убеждение +5</li>
+                {
+                    props.model?.skills.map((item, index) => {
+                      return (
+                        <li key={index}>{item.name}: {item.modifier}{item.proficient && <span className="save-icon">🧠</span>}</li>
+                      );
+                    })
+                }
               </ul>
             </section>
             <section className="spells">
               <h3>Заклинания (2 уровень)</h3>
               <ul>
-                <li>Целительное слово</li>
-                <li>Огни фей</li>
-                <li>Диссонантные шепоты</li>
-                <li>Язвительная насмешка</li>
+                {
+                    props.model?.spells.map((item, index) => {
+                      return (
+                        <li key={index}>{item.name}</li>
+                      );
+                    })
+                }
               </ul>
             </section>
           </div>
@@ -74,5 +93,3 @@ const DnDCharacterSheet: React.FC = () => {
     </div>
   );
 };
-
-export default DnDCharacterSheet;

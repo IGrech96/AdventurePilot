@@ -24,7 +24,7 @@ api:
       ondefinitionOpen:
         channel: 'definition-opened'
         args:
-        - content: string | null
+        - content: any | null
         - node: IDefinition
       sendSaveMarkdown:
         channel: 'save-markdown'

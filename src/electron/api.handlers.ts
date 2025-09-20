@@ -1,6 +1,7 @@
 import { applicationApi, ProjectConfiguration, ProjectTreeItem, IDefinition, IFileDefinition, asFileDefinition, SceneDefinition, CommonDefinition } from "./appApi.js";
 import fs from 'fs';
 import path from 'path';
+import yaml from 'js-yaml';
 
 export class ApiHandlers {
   constructor(
@@ -18,6 +19,9 @@ export class ApiHandlers {
       }
       if (!content) {
         content = ""
+      }
+      if (fileDefinition?.type == "npc") {
+        content = yaml.load(content)
       }
       api.file.ondefinitionOpen(content, node);
     });

@@ -5,6 +5,7 @@ import { Box, Paper, Typography } from '@mui/material';
 import MarkdownEditor from './editor/markdown-editor/markdown-editor';
 import { useEffect, useState } from 'react';
 import DnDCharacterSheet from './editor/dnd-character-sheet/dnd-character-sheet';
+import { asFileDefinition } from './appApi.d';
 
 type editorType = 'markdown' | 'character' | 'none'
 
@@ -17,15 +18,12 @@ function App() {
     return 'markdown';
   }
 
-  const getMarkdownContent = (def: IDefinition | undefined): SceneDefinition | OverviewDefinition | CommonDefinition | undefined => {
-    if (getType(def) == 'markdown') {
-      return def as any;
-    }
-    return undefined;
+  const getFileDefinition = (def: IDefinition | undefined): IFileDefinition | undefined => {
+    return asFileDefinition(def);
   }
 
   const [activeDefinition, setActiveDefinition] = useState<{
-    content?: string;
+    content?: any;
     node: IDefinition;
   } | null>(null);
 
@@ -56,8 +54,8 @@ function App() {
 
         {/* Right Pane: Working Area */}
         <Box component={Paper} elevation={3} sx={{ display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
-          { getType(activeDefinition?.node) == 'markdown' && <MarkdownEditor plainText={activeDefinition?.content} node={getMarkdownContent(activeDefinition?.node)} />}
-          { getType(activeDefinition?.node) == 'character' && <DnDCharacterSheet /> }
+          {getType(activeDefinition?.node) == 'markdown' && <MarkdownEditor plainText={activeDefinition?.content} node={getFileDefinition(activeDefinition?.node)} />}
+          {getType(activeDefinition?.node) == 'character' && <DnDCharacterSheet name={activeDefinition?.node.name} model={activeDefinition?.content} />}
         </Box>
       </Split>
 

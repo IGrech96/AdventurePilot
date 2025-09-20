@@ -24,12 +24,12 @@ function convertToTipTapJson(plainText: string): JSONContent {
   return processed;
 }
 
-export default function MarkdownEditor({ plainText, node }: { plainText?: string, node?: SceneDefinition | OverviewDefinition | CommonDefinition }) {
+export default function MarkdownEditor({ plainText, node }: { plainText?: string, node?: IFileDefinition }) {
 
   const [suggestions, setSuggestions] = useState<suggestionData[]>([])
   const [jsonContent, setJsonContent] = useState<JSONContent | null>(null);
 
-  const nodeRef = useRef<SceneDefinition | OverviewDefinition | CommonDefinition>(null);
+  const nodeRef = useRef<IFileDefinition>(null);
   useEffect(() => {
     if (node) {
       nodeRef.current = node;

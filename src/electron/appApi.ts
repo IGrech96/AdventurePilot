@@ -22,7 +22,7 @@ export class applicationApi {
         receiveOpenDefinition: (callback: (event: any, node: IDefinition) => void) => {
             ipcMain.on('open-definition', callback);
         },
-        ondefinitionOpen: (content: string | null, node: IDefinition) => {
+        ondefinitionOpen: (content: any | null, node: IDefinition) => {
             this.window.webContents.send('definition-opened', content, node);
         },
         receiveSaveMarkdown: (callback: (event: any, content: string, node: IFileDefinition) => void) => {
@@ -59,7 +59,7 @@ export interface IDefinition {
   type: DefinitionType
 }
 
-export interface IFileDefinition {
+export interface IFileDefinition extends IDefinition {
   file: string
 }
 
@@ -79,6 +79,8 @@ export interface OverviewDefinition extends IDefinition, IFileDefinition {
 export interface CommonDefinition extends IDefinition, IFileDefinition {
 }
 export interface NpcDefinition extends IDefinition, IFileDefinition {
+  engine: string
+  attributes: any
 }
 export interface ProjectTreeItem {
   children?: ProjectTreeItem[];
@@ -94,7 +96,9 @@ export type nodetype =
 
 export function asFileDefinition(object: unknown) : IFileDefinition | undefined {
   const reference: IFileDefinition = {
-    file: ''
+    file: '',
+    name: '',
+    type: 'common'
   };
 
   if (hasShape<IFileDefinition>(object, reference)){

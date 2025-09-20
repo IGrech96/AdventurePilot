@@ -4,7 +4,7 @@ export interface IDefinition {
   type: DefinitionType
 }
 
-export interface IFileDefinition {
+export interface IFileDefinition extends IDefinition {
   file: string
 }
 
@@ -24,6 +24,8 @@ export interface OverviewDefinition extends IDefinition, IFileDefinition {
 export interface CommonDefinition extends IDefinition, IFileDefinition {
 }
 export interface NpcDefinition extends IDefinition, IFileDefinition {
+  engine: string
+  attributes: any
 }
 export interface ProjectTreeItem {
   children?: ProjectTreeItem[];
