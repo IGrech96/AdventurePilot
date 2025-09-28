@@ -1,5 +1,18 @@
-.toolbar {
+.toolbar-project {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  width: 100%;
+
+}
+
+:root:not(.edit) .toolbar-project {
+  visibility: hidden;
+}
+
+.toolbar-common {
+  display: flex;
+  /* justify-content: flex-end; */
+  gap: 10px;
+  width: 100%;
 }

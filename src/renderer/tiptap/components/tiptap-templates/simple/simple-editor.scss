@@ -80,3 +80,7 @@ body,
     padding: 1rem 1.5rem 30vh;
   }
 }
+
+:root:not(.edit) .simple-editor-wrapper > .tiptap-toolbar {
+  visibility: hidden;
+}

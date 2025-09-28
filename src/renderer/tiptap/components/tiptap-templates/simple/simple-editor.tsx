@@ -76,7 +76,7 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
 import "@/components/tiptap-templates/simple/simple-editor.scss"
 
 import content from "@/components/tiptap-templates/simple/data/content2.json"
-import { forwardRef, useEffect, useImperativeHandle } from "react"
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
 import { MarkdownFileLink } from "@/extensions/markdown-file-link/markdown-file-link"
 import { LocalImage } from "@/extensions/local-image/local-image"
 import { TableToolbar } from "@/extensions/table-toolbar/table-toolbar"
@@ -158,10 +158,6 @@ const MainToolbarContent = ({
       <Spacer />
 
       {isMobile && <ToolbarSeparator />}
-
-      <ToolbarGroup>
-        <ThemeToggle defaultTheme="light" />
-      </ToolbarGroup>
     </>
   )
 }
@@ -232,6 +228,9 @@ function SimpleEditor(properties: SimpleEditorProperties, ref: React.Ref<SimpleE
     }
   }));
 
+
+
+
   const editor = useEditor({
     immediatelyRender: false,
     shouldRerenderOnTransaction: false,
@@ -287,6 +286,20 @@ function SimpleEditor(properties: SimpleEditorProperties, ref: React.Ref<SimpleE
     ],
     content: ''
   })
+
+  useEffect(() => {
+    const target = document.documentElement // or document.body
+    const observer = new MutationObserver(() => {
+      editor?.setEditable(target.classList.contains('edit'), true);
+    })
+
+    observer.observe(target, { attributes: true, attributeFilter: ['class'] })
+
+    // Initial check
+    editor?.setEditable(target.classList.contains('edit'), true);
+
+    return () => observer.disconnect()
+  }, [editor])
 
   useEffect(() => {
     if (editor && properties.jsonContent) {

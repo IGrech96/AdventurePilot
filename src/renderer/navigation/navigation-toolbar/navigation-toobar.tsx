@@ -5,8 +5,11 @@ import SaveIcon from '@mui/icons-material/SaveOutlined';
 import './navigation-toobar.css'
 import { Icon, rgbToHex, SvgIcon } from '@mui/material';
 import { Button } from '@/components/tiptap-ui-primitive/button';
+// import { ToggleButton } from '@/components/tiptap-ui-primitive';
 import { Toolbar } from '@/components/tiptap-ui-primitive/toolbar';
 import { TextAlignButton } from '@/components/tiptap-ui/text-align-button';
+import { ThemeToggle } from '@/components/tiptap-templates/simple/theme-toggle';
+import { ModeToggle } from './mode-toggle/mode-toggle';
 // import '@/components/tiptap-ui-primitive/button/button.scss';
 
 type NavigationToolbarProps = {
@@ -20,35 +23,41 @@ type NavigationToolbarProps = {
 export default function NavigationToolbar(properties: NavigationToolbarProps) {
   return (
     <Toolbar className='toolbar'>
-      <Button
-        type="button"
-        data-style="ghost"
-        data-active-state="off"
-        role="button"
-        tabIndex={-1}
-        disabled={!properties.canCreate}
-        data-disabled={!properties.canCreate}
-        aria-label="create new"
-        // aria-pressed={isActive}
-        tooltip="Create new"
-        onClick={properties.onCreateNew}
-      >
-        <AddOutlinedIcon className='tiptap-button-icon' />
-      </Button>
-      <Button
-        type="button"
-        data-style="ghost"
-        data-active-state="off"
-        role="button"
-        tabIndex={-1}
-        disabled={!properties.canSave}
-        data-disabled={!properties.canSave}
-        aria-label="Save"
-        tooltip="Save"
-        onClick={properties.save}
-      >
-        <SvgIcon component={SaveIcon} className='tiptap-button-icon' />
-      </Button>
+      <div className='toolbar-common'>
+        <ThemeToggle defaultTheme="light" />
+        <ModeToggle defaultMode='edit' />
+      </div>
+      <div className='toolbar-project'>
+        <Button
+          type="button"
+          data-style="ghost"
+          data-active-state="off"
+          role="button"
+          tabIndex={-1}
+          disabled={!properties.canCreate}
+          data-disabled={!properties.canCreate}
+          aria-label="create new"
+          // aria-pressed={isActive}
+          tooltip="Create new"
+          onClick={properties.onCreateNew}
+        >
+          <AddOutlinedIcon className='tiptap-button-icon' />
+        </Button>
+        <Button
+          type="button"
+          data-style="ghost"
+          data-active-state="off"
+          role="button"
+          tabIndex={-1}
+          disabled={!properties.canSave}
+          data-disabled={!properties.canSave}
+          aria-label="Save"
+          tooltip="Save"
+          onClick={properties.save}
+        >
+          <SvgIcon component={SaveIcon} className='tiptap-button-icon' />
+        </Button>
+      </div>
     </Toolbar>
     //   ref={toolbarRef}
     //   style={{
