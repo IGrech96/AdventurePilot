@@ -1,0 +1,10 @@
+.list-editable-item-delete-button {
+  display: inline;
+}
+
+.list-editable-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+

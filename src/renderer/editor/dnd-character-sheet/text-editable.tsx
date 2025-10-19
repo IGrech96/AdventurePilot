@@ -1,22 +1,31 @@
 import { ModelStore } from "./use-model-store";
 import './text-editable.css'
-import { FormEvent, useState } from "react";
+import { FormEvent, FocusEvent, useState } from "react";
+import { StoreApi, UseBoundStore, useStore } from "zustand";
 
 export type TextEditableProperties<T> = {
-  store: ModelStore<T>;
+  store: UseBoundStore<StoreApi<ModelStore<T>>>;
   path: (model: T) => any
   editable?: boolean;
   placeholder?: string;
+  defaultValue?: any;
+}
+
+function coalesce(left: any, defaultValue: any): any {
+  return left ?? defaultValue;
 }
 
 export default function TextEditable<T>(props: TextEditableProperties<T>) {
-  const [value, setValue] = useState(props.store.getValue(props.path))
-  const placeholder = props.placeholder ?? '  '
+  // const [value, setValue] = useState(coalesce(props.store.getValue(props.path), props.defaultValue))
+  const value = useStore(props.store, (state) => coalesce(state.getValue(props.path), props.defaultValue));
+  const placeholder = props.defaultValue ?? props.placeholder ?? '  '
 
-  const handleInput = (e: FormEvent<HTMLSpanElement>) => {
-    const newText = e.currentTarget.textContent ?? '';
-    setValue(newText)
-    props.store.updateModel(props.path, newText);
+  const handleBlur = (e: FocusEvent<HTMLSpanElement>) => {
+    const newText = e.currentTarget.textContent;
+    // setValue(newText)
+    // props.store..updateModel(props.path, value);
+    props.store.getState().updateModel(props.path, newText);
+
   }
 
   return (
@@ -26,7 +35,8 @@ export default function TextEditable<T>(props: TextEditableProperties<T>) {
       data-placeholder={placeholder}
       data-focused-advice={placeholder}
       suppressContentEditableWarning
-      onInput={handleInput}>
+      // onInput={handleInput}
+      onBlur={handleBlur}>
       {value}
     </span>
 

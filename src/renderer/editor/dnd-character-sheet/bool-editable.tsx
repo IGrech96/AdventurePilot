@@ -1,9 +1,10 @@
 import { ModelStore } from "./use-model-store";
 import './bool-editable.css'
 import { useState } from "react";
+import { StoreApi, UseBoundStore, useStore } from "zustand";
 
 export type BoolEditableProperties<T> = {
-  store: ModelStore<T>;
+  store: UseBoundStore<StoreApi<ModelStore<T>>>;
   path: (model: T) => any
   editable?: boolean;
   placeholder?: string;
@@ -12,7 +13,7 @@ export type BoolEditableProperties<T> = {
 
 export default function BoolEditable<T>(props: BoolEditableProperties<T>) {
 
-  const [active, setActive] = useState(props.store.getValue(props.path));
+  const active = useStore(props.store, (state) => state.getValue(props.path));
 
   const classes = [''];
   if (props.editable) {
@@ -24,8 +25,7 @@ export default function BoolEditable<T>(props: BoolEditableProperties<T>) {
   }
 
   const handleToggle = () => {
-    props.store.updateModel(props.path, !active)
-    setActive(!active);
+    props.store.getState().updateModel(props.path, !active);
   };
 
   return (

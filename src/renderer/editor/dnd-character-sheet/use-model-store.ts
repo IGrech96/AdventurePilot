@@ -32,7 +32,7 @@ export function createModelStore<T>(initialModel: T) {
         target[path[path.length - 1]] = value;
         return { model: newModel };
       }),
-  }))();
+  }));
 }
 
 function getPath<T>(expr: (obj: T) => any): string[] {

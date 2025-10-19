@@ -4,6 +4,7 @@ import DnDStatsBlock from './dnd-stats-block';
 import { CharacterSheet as DnDCharacterSheetModel } from './dnd-character-sheet-model';
 import { createModelStore } from './use-model-store';
 import TextEditable from './text-editable';
+import ListEditable from './list-editable';
 
 export type DnDCharacterSheetProperties = {
   name?: string
@@ -28,10 +29,9 @@ export default function DnDCharacterSheet(props: DnDCharacterSheetProperties) {
 
     return () => observer.disconnect()
   }, [setEditable])
-  //TODO: model can be null/undefined
-  // const characterStore = createModelStore<DnDCharacterSheetProperties>(props);
-const characterStoreRef = useRef(createModelStore(props));
-const characterStore = characterStoreRef.current;
+
+  const characterStoreRef = useRef(createModelStore(props));
+  const characterStore = characterStoreRef.current;
 
   return (
     <div className="sheet-container">
@@ -63,55 +63,55 @@ const characterStore = characterStoreRef.current;
           </section>
           <div className="stuff-grid">
             <section className="equipment">
-              <h3>Снаряжение</h3>
-              <ul>
-                {
-                  props.model?.equipment.map((item, index) => {
-                    const count = item.quantity > 1 ? `(x${item.quantity})` : ''
-                    const separator = item.description ? ': ' : ''
-                    return (
-                      <li key={index}>{item.name}{count}{separator}{item.description}</li>
-                    );
-                  })
-                }
-              </ul>
+              <ListEditable
+                editable={editable}
+                label='Снаряжение'
+                store={characterStore}
+                path={x => x.model?.equipment}
+                itemTemplate={[
+                  { type: 'text', path: (x) => x.name },
+                  { type: 'quantity', path: (x) => x.quantity },
+                  { type: 'separator', path: (x) => undefined },
+                  { type: 'text', path: (x) => x.description }
+                ]}
+              />
             </section>
             <section className="abilities">
-              <h3>Способности</h3>
-              <ul>
-                {
-                  props.model?.featuresAndTraits.map((item, index) => {
-                    const separator = item.description ? ': ' : ''
-                    return (
-                      <li key={index}>{item.name}{separator}{item.description}</li>
-                    );
-                  })
-                }
-              </ul>
+              <ListEditable
+                editable={editable}
+                label='Способности'
+                store={characterStore}
+                path={x => x.model?.featuresAndTraits}
+                itemTemplate={[
+                  { type: 'text', path: (x) => x.name },
+                  { type: 'separator', path: (x) => undefined },
+                  { type: 'text', path: (x) => x.description }
+                ]}
+              />
             </section>
             <section className="proficiencies">
-              <h3>Владения и навыки</h3>
-              <ul>
-                {
-                  props.model?.skills.map((item, index) => {
-                    return (
-                      <li key={index}>{item.name}: {item.modifier}{item.proficient && <span className="save-icon">🧠</span>}</li>
-                    );
-                  })
-                }
-              </ul>
+              <ListEditable
+                editable={editable}
+                label='Владения и навыки'
+                store={characterStore}
+                path={x => x.model?.skills}
+                itemTemplate={[
+                  { type: 'text', path: (x) => x.name },
+                  { type: 'separator', path: (x) => undefined },
+                  { type: 'text', path: (x) => x.modifier },
+                ]}
+              />
             </section>
             <section className="spells">
-              <h3>Заклинания (2 уровень)</h3>
-              <ul>
-                {
-                  props.model?.spells.map((item, index) => {
-                    return (
-                      <li key={index}>{item.name}</li>
-                    );
-                  })
-                }
-              </ul>
+              <ListEditable
+                editable={editable}
+                label='Заклинания'
+                store={characterStore}
+                path={x => x.model?.spells}
+                itemTemplate={[
+                  { type: 'text', path: (x) => x.name }
+                ]}
+              />
             </section>
           </div>
         </div>
