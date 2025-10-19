@@ -1,0 +1,18 @@
+span.editable-text-field {
+  display: inline-block;
+  border: 1px dashed #888;
+  background-color: #f0f8ff;
+  cursor: text;
+}
+
+span.editable-text-field[contenteditable]:empty::before {
+  content: attr(data-placeholder);
+  display: inline-block;
+  color: #aaa;
+  font-style: italic;
+}
+
+span.editable-text-field[contenteditable]:empty:focus::before {
+  content: attr(data-focused-advice);
+}
+

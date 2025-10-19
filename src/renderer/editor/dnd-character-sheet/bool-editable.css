@@ -1,0 +1,12 @@
+span.editable-bool-field {
+  display: inline-block;
+  /* border: 1px dashed #888; */
+  /* background-color: #f0f8ff; */
+  /* cursor: text; */
+  opacity: 0.3;
+  cursor: pointer;
+}
+
+span.editable-bool-field.active {
+  opacity: 1.0;
+}

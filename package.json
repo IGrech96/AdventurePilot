@@ -94,6 +94,7 @@
     "remark-rehype": "^11.1.2",
     "remark-stringify": "^11.0.0",
     "tiptap-markdown": "^0.8.10",
-    "unified": "^11.0.5"
+    "unified": "^11.0.5",
+    "zustand": "^5.0.8"
   }
 }
