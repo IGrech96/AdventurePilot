@@ -3,92 +3,119 @@ import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
 
-export class ApiHandlers {
+export class ApiHandlers implements Disposable {
   constructor(
+    private api: applicationApi,
     private projectFolder: string,
     private config: ProjectConfiguration
   ) {
 
   }
-  public Subscribe(api: applicationApi) {
-    api.file.receiveOpenDefinition((event: any, node: IDefinition) => {
-      let content;
-      const fileDefinition = asFileDefinition(node);
-      if (fileDefinition) {
-        content = fs.readFileSync(path.join(this.projectFolder, fileDefinition.file), 'utf8');
-      }
-      if (!content) {
-        content = ""
-      }
-      if (fileDefinition?.type == "npc") {
-        content = yaml.load(content)
-      }
-      api.file.ondefinitionOpen(content, node);
+  [Symbol.dispose](): void {
+    this.Unsubscribe();
+  }
+
+  public Unsubscribe(): void {
+
+  }
+
+  public Subscribe() {
+    this.api.file.receiveOpenDefinition(this.handleReceiveOpenNode);
+
+    this.api.file.receiveSaveMarkdown(this.handleReceiveSaveMarkdown);
+
+    this.api.file.receiveSaveCharacter(this.handleReceiveSaveCharacter);
+
+    this.api.project.receiveProjectItemClicked(this.handlerReceiveProjectItemClicked);
+
+    this.api.file.receiveFileChanged(this.handleReceiveFiledChanged);
+
+    this.api.application.receiveSaveRequest(this.handleReceiveSaveRequest);
+
+    this.api.project.handleGetAvailableItems(this.handleGetAvailableItems);
+
+    this.api.file.handleGetFilePreview(this.handleGetFilePreview)
+
+    this.api.file.handleSaveItemImage(this.handleSaveImage)
+
+    this.api.file.handleGetImageAsBase64(this.handlerGetImageAsBase64)
+  }
+
+  private handleReceiveSaveMarkdown(event: any, content: string, node: IFileDefinition) {
+    fs.writeFileSync(path.join(this.projectFolder, node.file), content, {
+      encoding: 'utf-8'
     });
+  }
 
-    api.file.receiveSaveMarkdown((event: any, content: string, node: IFileDefinition) => {
-      fs.writeFileSync(path.join(this.projectFolder, node.file), content, {
-        encoding: 'utf-8'
-      });
+  private handleReceiveSaveCharacter(event: any, content: any, node: IFileDefinition) {
+    const data = yaml.dump(content);
+    fs.writeFileSync(path.join(this.projectFolder, node.file), data, {
+      encoding: 'utf-8'
     });
+  }
 
-    api.file.receiveSaveCharacter((event: any, content: any, node: IFileDefinition) => {
-      const data = yaml.dump(content);
-      fs.writeFileSync(path.join(this.projectFolder, node.file), data, {
-        encoding: 'utf-8'
-      });
-    });
+  private handlerReceiveProjectItemClicked(event: any, node: ProjectTreeItem) {
+    this.api.project.onProjectItemClicked(node);
+  }
 
-    api.project.receiveProjectItemClicked((event: any, node: ProjectTreeItem) => {
-      api.project.onProjectItemClicked(node);
-    });
+  private handleReceiveOpenNode(event: any, node: IDefinition) {
+    let content;
+    const fileDefinition = asFileDefinition(node);
+    if (fileDefinition) {
+      content = fs.readFileSync(path.join(this.projectFolder, fileDefinition.file), 'utf8');
+    }
+    if (!content) {
+      content = ""
+    }
+    if (fileDefinition?.type == "npc") {
+      content = yaml.load(content)
+    }
+    this.api.file.ondefinitionOpen(content, node);
+  }
 
-    api.file.receiveFileChanged((event: any, node: IFileDefinition) => {
-      api.file.onFileChanged(node);
-    });
+  private handleReceiveFiledChanged(event: any, node: IFileDefinition) {
+    this.api.file.onFileChanged(node);
+  }
 
-    api.application.receiveSaveRequest((event: any) => {
-      api.application.onSaveRequest();
-    });
+  private handleReceiveSaveRequest(event: any) {
+    this.api.application.onSaveRequest();
+  }
 
-    api.project.handleGetAvailableItems((event: any) => this.handleGetAvailableItems(event));
+  private handleGetFilePreview(event: any, filePath: string): string {
+    let content = fs.readFileSync(path.join(this.projectFolder, filePath), 'utf8');
+    if (!content) {
+      content = ""
+    }
+    return content;
+  }
 
-    api.file.handleGetFilePreview((event: any, filePath: string) => {
-      let content = fs.readFileSync(path.join(this.projectFolder, filePath), 'utf8');
-      if (!content) {
-        content = ""
-      }
-      return content;
-    })
+  private handleSaveImage(
+    event: any,
+    node: IDefinition,
+    name: string,
+    data: Uint8Array<ArrayBuffer>): string {
 
-    api.file.handleSaveItemImage((
-      event: any,
-      node: IDefinition,
-      name: string,
-      data: Uint8Array<ArrayBuffer>) => {
+    const rootFolder = "images";
+    const fileDefinition = asFileDefinition(node);
 
-      const rootFolder = "images";
-      const fileDefinition = asFileDefinition(node);
+    const subfolder = fileDefinition ? path.basename(fileDefinition.file, path.extname(fileDefinition.file)) : node.type
 
-      const subfolder = fileDefinition ? path.basename(fileDefinition.file, path.extname(fileDefinition.file)) : node.type
+    const fullDirPath = path.join(this.projectFolder, rootFolder, subfolder);
+    const fullFilePath = path.join(fullDirPath, name);
 
-      const fullDirPath = path.join(this.projectFolder, rootFolder, subfolder);
-      const fullFilePath = path.join(fullDirPath, name);
+    if (!fs.existsSync(fullDirPath)) {
+      fs.mkdirSync(fullDirPath, { recursive: true });
+    }
+    fs.writeFileSync(fullFilePath, data, { flush: true });
+    return path.join('/', rootFolder, subfolder, name).replace(/\\/g, '/');
+  }
 
-      if (!fs.existsSync(fullDirPath)) {
-        fs.mkdirSync(fullDirPath, { recursive: true });
-      }
-      fs.writeFileSync(fullFilePath, data, { flush: true });
-      return path.join('/', rootFolder, subfolder, name).replace(/\\/g, '/');
-    })
-
-    api.file.handleGetImageAsBase64((event: any, filePath: string) => {
-      let content = fs.readFileSync(path.join(this.projectFolder, filePath)).toString('base64');
-      if (!content) {
-        content = ""
-      }
-      return content;
-    })
+  private handlerGetImageAsBase64(event: any, filePath: string): string {
+    let content = fs.readFileSync(path.join(this.projectFolder, filePath)).toString('base64');
+    if (!content) {
+      content = ""
+    }
+    return content;
   }
 
   private handleGetAvailableItems(event: any): (IDefinition)[] {
