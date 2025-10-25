@@ -25,6 +25,7 @@ export default class ConfigurationManager {
             }
 
             data.common.type = 'common';
+            data.common.name = 'common';
             data.overview.type = 'overview';
 
             data.npces.forEach(n => n.type = 'npc');
