@@ -28,6 +28,9 @@ export class applicationApi {
         receiveSaveMarkdown: (callback: (event: any, content: string, node: IFileDefinition) => void) => {
             ipcMain.on('save-markdown', callback);
         },
+        receiveSaveCharacter: (callback: (event: any, content: any, node: IFileDefinition) => void) => {
+            ipcMain.on('save-character', callback);
+        },
         receiveFileChanged: (callback: (event: any, node: IFileDefinition) => void) => {
             ipcMain.on('file-changed', callback);
         },

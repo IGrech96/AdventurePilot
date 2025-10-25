@@ -32,6 +32,13 @@ export class ApiHandlers {
       });
     });
 
+    api.file.receiveSaveCharacter((event: any, content: any, node: IFileDefinition) => {
+      const data = yaml.dump(content);
+      fs.writeFileSync(path.join(this.projectFolder, node.file), data, {
+        encoding: 'utf-8'
+      });
+    });
+
     api.project.receiveProjectItemClicked((event: any, node: ProjectTreeItem) => {
       api.project.onProjectItemClicked(node);
     });

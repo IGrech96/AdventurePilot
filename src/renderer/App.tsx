@@ -55,7 +55,7 @@ function App() {
         {/* Right Pane: Working Area */}
         <Box component={Paper} elevation={3} sx={{ display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
           {getType(activeDefinition?.node) == 'markdown' && <MarkdownEditor plainText={activeDefinition?.content} node={getFileDefinition(activeDefinition?.node)} />}
-          {getType(activeDefinition?.node) == 'character' && <DnDCharacterSheet name={activeDefinition?.node.name} model={activeDefinition?.content} />}
+          {getType(activeDefinition?.node) == 'character' && <DnDCharacterSheet name={activeDefinition?.node.name} model={activeDefinition?.content} node={getFileDefinition(activeDefinition?.node)} />}
         </Box>
       </Split>
 

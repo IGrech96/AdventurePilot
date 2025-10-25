@@ -16,6 +16,7 @@ declare global {
                 subscribe_ondefinitionOpen: (callback: (event: any, content: any | null, node: IDefinition) => void) => void;
                 unsubscribe_ondefinitionOpen: (callback: (event: any, content: any | null, node: IDefinition) => void) => void;
                 sendSaveMarkdown: (content: string, node: IFileDefinition) => void;
+                sendSaveCharacter: (content: any, node: IFileDefinition) => void;
                 sendFileChanged: (node: IFileDefinition) => void;
                 subscribe_onFileChanged: (callback: (event: any, node: IFileDefinition) => void) => void;
                 unsubscribe_onFileChanged: (callback: (event: any, node: IFileDefinition) => void) => void;

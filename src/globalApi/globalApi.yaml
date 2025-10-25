@@ -31,6 +31,11 @@ api:
         args:
         - content: string
         - node: IFileDefinition
+      sendSaveCharacter:
+        channel: 'save-character'
+        args:
+        - content: any
+        - node: IFileDefinition
       sendFileChanged:
         channel: 'file-changed'
         args:

@@ -33,6 +33,9 @@ contextBridge.exposeInMainWorld('applicationApi', {
         sendSaveMarkdown: (content, node) => {
             ipcRenderer.send('save-markdown', content, node);
         },
+        sendSaveCharacter: (content, node) => {
+            ipcRenderer.send('save-character', content, node);
+        },
         sendFileChanged: (node) => {
             ipcRenderer.send('file-changed', node);
         },

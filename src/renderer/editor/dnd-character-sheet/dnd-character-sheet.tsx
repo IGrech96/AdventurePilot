@@ -9,6 +9,7 @@ import ListEditable from './list-editable';
 export type DnDCharacterSheetProperties = {
   name?: string
   model?: DnDCharacterSheetModel
+  node?: IFileDefinition
 }
 
 
@@ -32,6 +33,25 @@ export default function DnDCharacterSheet(props: DnDCharacterSheetProperties) {
 
   const characterStoreRef = useRef(createModelStore(props));
   const characterStore = characterStoreRef.current;
+
+  characterStore.subscribe((e: any) => {
+    if (props.node)
+      window.applicationApi.file.sendFileChanged(props.node)
+  });
+
+  const save = () => {
+    const model = characterStore.getState().model.model;
+    const node = characterStore.getState().model.node;
+    if (model && node) {
+      window.applicationApi.file.sendSaveCharacter(model, node);
+    }
+  }
+
+  useEffect(() => {
+    window.applicationApi.application.subscribe_onSaveRequest(save);
+    return () => window.applicationApi.application.unsubscribe_onSaveRequest(save);
+  });
+
 
   return (
     <div className="sheet-container">

@@ -5,6 +5,7 @@ import TextEditable from "./text-editable";
 import { Button } from '@/components/tiptap-ui-primitive/button';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { StoreApi, UseBoundStore, useStore } from "zustand";
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 
 
 export type ListEditableItem<TItem> = {
@@ -23,27 +24,31 @@ export type ListEditableProperties<T, TItem> = {
 export default function ListEditable<T, TItem extends object>(props: ListEditableProperties<T, TItem>) {
 
   const items = useStore(props.store, (state) => state.getValue(props.path));
-  // const [items, setItems] = useState(props.store.getValue(props.path) ?? Array.from({ length: 0 }));
-
-  // const classes = [''];
-  // if (props.editable) {
-  //   classes.push('editable-bool-field')
-  // }
-
-  // if (active) {
-  //   classes.push('active')
-  // }
-
-  // const handleToggle = () => {
-  //   props.store.updateModel(props.path, !active)
-  //   setActive(!active);
-  // };
 
   const template = props.itemTemplate;
+  const handleNewItem = (event: MouseEvent<HTMLButtonElement>) => {
+    const copy = [...items];
+    copy.push({})
+
+    props.store.getState().updateModel(props.path, copy);
+  }
 
   return (
     <>
-      <h3>{props.label}</h3>
+      <h3 className="list-editable-item">{props.label}{props.editable && <Button
+        className="list-editable-item-delete-button"
+        type="button"
+        data-style="ghost"
+        data-active-state="off"
+        role="button"
+        tabIndex={-1}
+        aria-label="add new"
+        // aria-pressed={isActive}
+        tooltip="Add New"
+        onClick={handleNewItem}
+      >
+        <AddOutlinedIcon className='tiptap-button-icon' />
+      </Button>}</h3>
       <ul>
         {
           items.map((item: TItem, index: number) => {
@@ -53,7 +58,6 @@ export default function ListEditable<T, TItem extends object>(props: ListEditabl
               copy.splice(localIndex, 1);
 
               props.store.getState().updateModel(props.path, copy);
-              // setItems(copy);
             }
 
 
