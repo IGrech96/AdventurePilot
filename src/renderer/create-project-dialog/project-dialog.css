@@ -1,0 +1,61 @@
+.project-dialog {
+  width: 100%;
+  padding: 24px;
+  background: #f3f3f3;
+  border-radius: 8px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.checkbox-group {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn.cancel {
+  background: #e0e0e0;
+}
+
+.btn.create {
+  background: #0078d4;
+  color: white;
+}
+
+.btn.create:disabled {
+  background-color: #ccc; /* Light gray for disabled look */
+  color: #666;            /* Dimmed text for contrast */
+  cursor: not-allowed;    /* Shows it's not clickable */
+  opacity: 0.6;           /* Optional: adds visual softness */
+}
+

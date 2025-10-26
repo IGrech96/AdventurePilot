@@ -5,6 +5,12 @@ export class applicationApi {
     constructor(protected window: BrowserWindow) {
     }
     public project = {
+        receiveCreateNewCancelled: (callback: (event: any, ) => void) => {
+            ipcMain.on('new-project-canceled', callback);
+        },
+        receiveCreateNew: (callback: (event: any, name: string, path: string) => void) => {
+            ipcMain.on('new-project', callback);
+        },
         onProjectOpen: (data: ProjectConfiguration) => {
             this.window.webContents.send('project-opened', data);
         },
@@ -19,6 +25,12 @@ export class applicationApi {
         },
     }
     public file = {
+        handleSelectFolder: (callback: (event: any, ) => string | null) => {
+            ipcMain.handle('select-folder', callback);
+        },
+        onDefaultProjectFolder: (path: string) => {
+            this.window.webContents.send('default-folder', path);
+        },
         receiveOpenDefinition: (callback: (event: any, node: IDefinition) => void) => {
             ipcMain.on('open-definition', callback);
         },

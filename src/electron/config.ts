@@ -67,6 +67,9 @@ export default class ConfigurationManager {
     };
 
     const data = yaml.dump(config);
+    if (!fs.existsSync(projectFolder)){
+      fs.mkdirSync(projectFolder);
+    }
     fs.writeFileSync(path.join(projectFolder, ConfigurationManager.projectFile), data);
 
     return config;

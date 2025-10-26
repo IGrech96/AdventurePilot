@@ -87,6 +87,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hotkeys-hook": "^5.1.0",
+    "react-router-dom": "^7.9.4",
     "react-split": "^2.0.14",
     "rehype-stringify": "^10.0.1",
     "remark-gfm": "^4.0.1",

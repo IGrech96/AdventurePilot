@@ -4,6 +4,8 @@ declare global {
     interface Window {
         applicationApi: {
             project: {
+                sendCreateNewCancelled: () => void;
+                sendCreateNew: (name: string, path: string) => void;
                 subscribe_onProjectOpen: (callback: (event: any, data: ProjectConfiguration) => void) => void;
                 unsubscribe_onProjectOpen: (callback: (event: any, data: ProjectConfiguration) => void) => void;
                 sendProjectItemClicked: (node: ProjectTreeItem) => void;
@@ -12,6 +14,9 @@ declare global {
                 invokeGetAvailableItems: () => Promise<(IDefinition)[]>;
             },
             file: {
+                invokeSelectFolder: () => Promise<string | null>;
+                subscribe_onDefaultProjectFolder: (callback: (event: any, path: string) => void) => void;
+                unsubscribe_onDefaultProjectFolder: (callback: (event: any, path: string) => void) => void;
                 sendOpenDefinition: (node: IDefinition) => void;
                 subscribe_ondefinitionOpen: (callback: (event: any, content: any | null, node: IDefinition) => void) => void;
                 unsubscribe_ondefinitionOpen: (callback: (event: any, content: any | null, node: IDefinition) => void) => void;

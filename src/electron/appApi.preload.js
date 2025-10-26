@@ -1,6 +1,12 @@
 const { contextBridge, ipcRenderer } = require('electron')
 contextBridge.exposeInMainWorld('applicationApi', {
     project: {
+        sendCreateNewCancelled: () => {
+            ipcRenderer.send('new-project-canceled', );
+        },
+        sendCreateNew: (name, path) => {
+            ipcRenderer.send('new-project', name, path);
+        },
         subscribe_onProjectOpen: (callback) => {
             ipcRenderer.on('project-opened', callback);
         },
@@ -21,6 +27,15 @@ contextBridge.exposeInMainWorld('applicationApi', {
         },
     },
     file: {
+        invokeSelectFolder: () => {
+            return ipcRenderer.invoke('select-folder', );
+        },
+        subscribe_onDefaultProjectFolder: (callback) => {
+            ipcRenderer.on('default-folder', callback);
+        },
+        unsubscribe_onDefaultProjectFolder: (callback) => {
+            ipcRenderer.removeListener('default-folder', callback);
+        },
         sendOpenDefinition: (node) => {
             ipcRenderer.send('open-definition', node);
         },

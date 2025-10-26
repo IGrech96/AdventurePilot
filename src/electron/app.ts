@@ -1,5 +1,6 @@
 import { app, BrowserWindow, Menu, MenuItem, dialog } from 'electron';
 import Main from './main.js';
+import {ProjectDialog} from './create-project/create-project.js'
 
 const main = new Main(app, BrowserWindow);
 
@@ -10,15 +11,11 @@ const handleOpen = () => {
 }
 
 const handleNew = async () => {
-  const result = await dialog.showOpenDialog({
-    title: 'Select a folder to save the project',
-    properties: ['openDirectory', 'createDirectory']
-  });
 
-  if (!result.canceled && result.filePaths.length > 0) {
-    const selectedPath = result.filePaths[0];
-    console.log('Selected folder:', selectedPath);
-    // You can now use this path to save your file
+  const dialog = new ProjectDialog(app, BrowserWindow)
+  const result = await dialog.showDialog();
+  if (result) {
+    main.CreateNew(result.name, result.path);
   }
 }
 

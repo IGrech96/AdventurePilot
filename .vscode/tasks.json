@@ -23,6 +23,12 @@
       "type": "shell",
       "command": "cp ${workspaceFolder}/src/electron/appApi.preload.js ${workspaceFolder}/dist/electron",
       "problemMatcher": [],
+    },
+    {
+      "label": "Generate Global API",
+      "type": "shell",
+      "command": "yarn run generate-ipc",
+      "problemMatcher": [],
     }
   ]
 }

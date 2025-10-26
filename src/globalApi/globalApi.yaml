@@ -1,6 +1,13 @@
 api:
   applicationApi:
     project:
+      sendCreateNewCancelled:
+        channel: 'new-project-canceled'
+      sendCreateNew:
+        channel: 'new-project'
+        args:
+          - name: string
+          - path: string
       onProjectOpen:
         channel: 'project-opened'
         args:
@@ -17,6 +24,13 @@ api:
         channel: 'get-available-items'
         return: (IDefinition)[]
     file:
+      invokeSelectFolder:
+        channel: 'select-folder'
+        return: string | null
+      onDefaultProjectFolder:
+        channel: 'default-folder'
+        args:
+          - path: string
       sendOpenDefinition:
         channel: 'open-definition'
         args:
