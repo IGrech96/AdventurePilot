@@ -5,63 +5,102 @@ export class applicationApi {
     constructor(protected window: BrowserWindow) {
     }
     public project = {
-        receiveCreateNewCancelled: (callback: (event: any, ) => void) => {
+        subscribe_receiveCreateNewCancelled: (callback: (event: any, ) => void) => {
             ipcMain.on('new-project-canceled', callback);
         },
-        receiveCreateNew: (callback: (event: any, name: string, path: string) => void) => {
+        unsubscribe_receiveCreateNewCancelled: (callback: (event: any, ) => void) => {
+            ipcMain.removeListener('new-project-canceled', callback);
+        },
+        subscribe_receiveCreateNew: (callback: (event: any, name: string, path: string) => void) => {
             ipcMain.on('new-project', callback);
+        },
+        unsubscribe_receiveCreateNew: (callback: (event: any, name: string, path: string) => void) => {
+            ipcMain.removeListener('new-project', callback);
         },
         onProjectOpen: (data: ProjectConfiguration) => {
             this.window.webContents.send('project-opened', data);
         },
-        receiveProjectItemClicked: (callback: (event: any, node: ProjectTreeItem) => void) => {
+        subscribe_receiveProjectItemClicked: (callback: (event: any, node: ProjectTreeItem) => void) => {
             ipcMain.on('item-clicked', callback);
+        },
+        unsubscribe_receiveProjectItemClicked: (callback: (event: any, node: ProjectTreeItem) => void) => {
+            ipcMain.removeListener('item-clicked', callback);
         },
         onProjectItemClicked: (node: ProjectTreeItem) => {
             this.window.webContents.send('item-clicked', node);
         },
-        handleGetAvailableItems: (callback: (event: any, ) => (IDefinition)[]) => {
+        subscribe_handleGetAvailableItems: (callback: (event: any, ) => (IDefinition)[]) => {
             ipcMain.handle('get-available-items', callback);
+        },
+        unsubscribe_handleGetAvailableItems: (callback: (event: any, ) => (IDefinition)[]) => {
+            ipcMain.removeListener('get-available-items', callback);
         },
     }
     public file = {
-        handleSelectFolder: (callback: (event: any, ) => string | null) => {
+        subscribe_handleSelectFolder: (callback: (event: any, ) => string | null) => {
             ipcMain.handle('select-folder', callback);
+        },
+        unsubscribe_handleSelectFolder: (callback: (event: any, ) => string | null) => {
+            ipcMain.removeListener('select-folder', callback);
         },
         onDefaultProjectFolder: (path: string) => {
             this.window.webContents.send('default-folder', path);
         },
-        receiveOpenDefinition: (callback: (event: any, node: IDefinition) => void) => {
+        subscribe_receiveOpenDefinition: (callback: (event: any, node: IDefinition) => void) => {
             ipcMain.on('open-definition', callback);
+        },
+        unsubscribe_receiveOpenDefinition: (callback: (event: any, node: IDefinition) => void) => {
+            ipcMain.removeListener('open-definition', callback);
         },
         ondefinitionOpen: (content: any | null, node: IDefinition) => {
             this.window.webContents.send('definition-opened', content, node);
         },
-        receiveSaveMarkdown: (callback: (event: any, content: string, node: IFileDefinition) => void) => {
+        subscribe_receiveSaveMarkdown: (callback: (event: any, content: string, node: IFileDefinition) => void) => {
             ipcMain.on('save-markdown', callback);
         },
-        receiveSaveCharacter: (callback: (event: any, content: any, node: IFileDefinition) => void) => {
+        unsubscribe_receiveSaveMarkdown: (callback: (event: any, content: string, node: IFileDefinition) => void) => {
+            ipcMain.removeListener('save-markdown', callback);
+        },
+        subscribe_receiveSaveCharacter: (callback: (event: any, content: any, node: IFileDefinition) => void) => {
             ipcMain.on('save-character', callback);
         },
-        receiveFileChanged: (callback: (event: any, node: IFileDefinition) => void) => {
+        unsubscribe_receiveSaveCharacter: (callback: (event: any, content: any, node: IFileDefinition) => void) => {
+            ipcMain.removeListener('save-character', callback);
+        },
+        subscribe_receiveFileChanged: (callback: (event: any, node: IFileDefinition) => void) => {
             ipcMain.on('file-changed', callback);
+        },
+        unsubscribe_receiveFileChanged: (callback: (event: any, node: IFileDefinition) => void) => {
+            ipcMain.removeListener('file-changed', callback);
         },
         onFileChanged: (node: IFileDefinition) => {
             this.window.webContents.send('file-changed', node);
         },
-        handleGetFilePreview: (callback: (event: any, filePath: string) => string) => {
+        subscribe_handleGetFilePreview: (callback: (event: any, filePath: string) => string) => {
             ipcMain.handle('get-file-preview', callback);
         },
-        handleSaveItemImage: (callback: (event: any, node: IDefinition, imageName: string, data: Uint8Array<ArrayBuffer>) => string) => {
+        unsubscribe_handleGetFilePreview: (callback: (event: any, filePath: string) => string) => {
+            ipcMain.removeListener('get-file-preview', callback);
+        },
+        subscribe_handleSaveItemImage: (callback: (event: any, node: IDefinition, imageName: string, data: Uint8Array<ArrayBuffer>) => string) => {
             ipcMain.handle('save-item-image', callback);
         },
-        handleGetImageAsBase64: (callback: (event: any, path: string) => string) => {
+        unsubscribe_handleSaveItemImage: (callback: (event: any, node: IDefinition, imageName: string, data: Uint8Array<ArrayBuffer>) => string) => {
+            ipcMain.removeListener('save-item-image', callback);
+        },
+        subscribe_handleGetImageAsBase64: (callback: (event: any, path: string) => string) => {
             ipcMain.handle('get-image-as-base64', callback);
+        },
+        unsubscribe_handleGetImageAsBase64: (callback: (event: any, path: string) => string) => {
+            ipcMain.removeListener('get-image-as-base64', callback);
         },
     }
     public application = {
-        receiveSaveRequest: (callback: (event: any, ) => void) => {
+        subscribe_receiveSaveRequest: (callback: (event: any, ) => void) => {
             ipcMain.on('invoke-save', callback);
+        },
+        unsubscribe_receiveSaveRequest: (callback: (event: any, ) => void) => {
+            ipcMain.removeListener('invoke-save', callback);
         },
         onSaveRequest: () => {
             this.window.webContents.send('save-requested', );

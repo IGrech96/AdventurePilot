@@ -14,6 +14,7 @@ export default class Main {
   private mainWindow: BrowserWindow | null = null;
   private api?: applicationApi;
   private handlers?: ApiHandlers;
+  private handlersUnsubscriber?: () => void;
 
   constructor(
     private application: Electron.App,
@@ -72,10 +73,13 @@ export default class Main {
 
     const config = manager.TryReadProjectConfigurationFolder(path);
     if (config) {
-      this.handlers?.Unsubscribe();
+      if (this.handlersUnsubscriber){
+        this.handlersUnsubscriber();
+      }
+
 
       this.handlers = new ApiHandlers(this.api!, path, config);
-      this.handlers.Subscribe();
+      this.handlersUnsubscriber = this.handlers.Subscribe();
       this.api?.project.onProjectOpen(config);
 
       return true;
@@ -88,10 +92,12 @@ export default class Main {
 
     const config = manager.CreateEmpty(name, path);
 
-    this.handlers?.Unsubscribe();
+    if (this.handlersUnsubscriber){
+        this.handlersUnsubscriber();
+      }
 
     this.handlers = new ApiHandlers(this.api!, path, config);
-    this.handlers.Subscribe();
+    this.handlersUnsubscriber = this.handlers.Subscribe();
     this.api?.project.onProjectOpen(config);
   }
 }

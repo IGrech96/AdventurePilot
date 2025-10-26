@@ -100,8 +100,12 @@ if (data && data.api) {
           rendererGlobalApi.push(`${indent(4)}${methodName}: (${argNamesTs.join(', ')}) => void;`)
 
           const receiveName = methodName.replace('send', 'receive');
-          electronMainApi.push(`${indent(2)}${receiveName}: (callback: (event: any, ${argNameDefinitions.join(', ')}) => void) => {`)
+          electronMainApi.push(`${indent(2)}subscribe_${receiveName}: (callback: (event: any, ${argNameDefinitions.join(', ')}) => void) => {`)
           electronMainApi.push(`${indent(3)}ipcMain.on('${channel}', callback);`)
+          electronMainApi.push(`${indent(2)}},`);
+
+          electronMainApi.push(`${indent(2)}unsubscribe_${receiveName}: (callback: (event: any, ${argNameDefinitions.join(', ')}) => void) => {`)
+          electronMainApi.push(`${indent(3)}ipcMain.removeListener('${channel}', callback);`)
           electronMainApi.push(`${indent(2)}},`);
         } else {
           const ret = data.api[apiName][domainName][methodName].return;
@@ -113,8 +117,12 @@ if (data && data.api) {
           rendererGlobalApi.push(`${indent(4)}${methodName}: (${argNamesTs.join(', ')}) => Promise<${ret}>;`)
 
           const handleName = methodName.replace('invoke', 'handle');
-          electronMainApi.push(`${indent(2)}${handleName}: (callback: (event: any, ${argNameDefinitions.join(', ')}) => ${ret}) => {`)
+          electronMainApi.push(`${indent(2)}subscribe_${handleName}: (callback: (event: any, ${argNameDefinitions.join(', ')}) => ${ret}) => {`)
           electronMainApi.push(`${indent(3)}ipcMain.handle('${channel}', callback);`)
+          electronMainApi.push(`${indent(2)}},`);
+
+          electronMainApi.push(`${indent(2)}unsubscribe_${handleName}: (callback: (event: any, ${argNameDefinitions.join(', ')}) => ${ret}) => {`)
+          electronMainApi.push(`${indent(3)}ipcMain.removeListener('${channel}', callback);`)
           electronMainApi.push(`${indent(2)}},`);
         }
       });
@@ -136,46 +144,6 @@ if (data && data.api) {
 rendererGlobalApi.push(mContents);
 electronMainApi.push(mContents);
 electronMainApi.push(fContents);
-
-// if (data && data.models) {
-//   const models = Object.keys(data.models);
-
-//   models.forEach(modelName => {
-//     rendererGlobalApi.push(`${indent(1)}export interface ${modelName} {`);
-//     electronMainApi.push(`export interface ${modelName} {`);
-
-//     const properties = Object.keys(data.models[modelName]);
-
-//     properties.forEach(element => {
-//       rendererGlobalApi.push(`${indent(2)}${element}: ${data.models[modelName][element]};`);
-//       electronMainApi.push(`${indent(1)}${element}: ${data.models[modelName][element]};`);
-//     });
-
-//     rendererGlobalApi.push(`${indent(1)}}`);
-//     electronMainApi.push(`}`);
-//   });
-// }
-
-// if (data && data.enums) {
-//   const enums = Object.keys(data.enums);
-
-//   enums.forEach(enumName => {
-//     rendererGlobalApi.push(`${indent(1)}export type ${enumName} =`);
-//     electronMainApi.push(`export type ${enumName} = `);
-
-//     const properties = Object.keys(data.enums[enumName]);
-
-//     for (let index = 0; index < properties.length; index++) {
-//       const elementName = properties[index];
-//       const enumItem = data.enums[enumName][elementName];
-
-//       const suffix = index == properties.length - 1 ? ';' : ' |'
-
-//       rendererGlobalApi.push(`${indent(2)}${enumItem}${suffix}`);
-//       electronMainApi.push(`${indent(1)}${enumItem}${suffix}`);
-//     }
-//   });
-// }
 
 rendererGlobalApi.push("}");
 rendererGlobalApi.push(fContents);

@@ -45,14 +45,16 @@ export class ProjectDialog {
     };
 
     const onClose = () => {
-
+      this.api.project.unsubscribe_receiveCreateNew(onCreateNew);
+      this.api.project.unsubscribe_receiveCreateNewCancelled(onCreateNewCancelled);
+      this.mainWindow.removeListener('close', onClose);
     };
 
     this.mainWindow.on('close', onClose);
 
     this.api = new applicationApi(this.mainWindow);
-    this.api.project.receiveCreateNewCancelled(onCreateNewCancelled);
-    this.api.project.receiveCreateNew(onCreateNew);
+    this.api.project.subscribe_receiveCreateNewCancelled(onCreateNewCancelled);
+    this.api.project.subscribe_receiveCreateNew(onCreateNew);
 
   }
 
