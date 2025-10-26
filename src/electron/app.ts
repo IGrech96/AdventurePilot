@@ -1,13 +1,24 @@
 import { app, BrowserWindow, Menu, MenuItem, dialog } from 'electron';
 import Main from './main.js';
-import {ProjectDialog} from './create-project/create-project.js'
+import { ProjectDialog } from './create-project/create-project.js'
 
 const main = new Main(app, BrowserWindow);
 
 const mainMenu = new Menu();
 
 const handleOpen = () => {
-
+  dialog.showOpenDialog({
+    title: 'Select a folder',
+    properties: ['openDirectory', 'createDirectory']
+  }).then(result => {
+    if (!result.canceled && result.filePaths.length > 0) {
+      if (!main.Open(result.filePaths[0])){
+        dialog.showErrorBox("Invalid Folder", "The selected folder is not valid.")
+      }
+    }
+  }).catch(err => {
+    console.error('Error selecting folder:', err);
+  });
 }
 
 const handleNew = async () => {

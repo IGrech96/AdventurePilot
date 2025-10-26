@@ -66,7 +66,7 @@ export default class Main {
     this.api!.application.onSaveRequest();
   }
 
-  public Open(path: string): void {
+  public Open(path: string): boolean {
 
     const manager = new ConfigurationManager();
 
@@ -77,7 +77,10 @@ export default class Main {
       this.handlers = new ApiHandlers(this.api!, path, config);
       this.handlers.Subscribe();
       this.api?.project.onProjectOpen(config);
+
+      return true;
     }
+    return false;
   }
 
   public CreateNew(name: string, path: string): void {

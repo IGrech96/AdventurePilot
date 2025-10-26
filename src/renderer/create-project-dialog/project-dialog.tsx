@@ -52,22 +52,28 @@ export const ProjectDialog: React.FC<Props> = () => {
     const newProjectName = projectName ?? state.projectName;
     let newTargetFolder = targetFolder ?? state.targetFolder;
     const canCreate = Boolean(newProjectName && newTargetFolder);
-    const newUseProjectNameDir = useProjectNameDir ?? state.useProjectNameDirectory;
+    let newUseProjectNameDir = useProjectNameDir ?? state.useProjectNameDirectory;
 
     const delimeter = newTargetFolder.includes('\\') || newTargetFolder.includes(':') ? '\\' : '/';
     const tokens = newTargetFolder.split(delimeter).filter(v => !!v)
 
     // path before update already contains projectName, remove it
-    if (state.useProjectNameDirectory && tokens[tokens.length - 1] == normilizePath(state.projectName)) {
-      newTargetFolder = tokens.slice(0, -1).join(delimeter);
-    }
-
-    if (newUseProjectNameDir) {
-      const projectNameAsPath = normilizePath(newProjectName);
-      if (newTargetFolder.endsWith(delimeter)) {
-        newTargetFolder = newTargetFolder.slice(0, -1);
+    // and we are changing the not the path
+    if (newTargetFolder == state.targetFolder) {
+      if (state.useProjectNameDirectory && tokens[tokens.length - 1] == normilizePath(state.projectName)) {
+        newTargetFolder = tokens.slice(0, -1).join(delimeter);
       }
-      newTargetFolder = [newTargetFolder, projectNameAsPath].join(delimeter);
+
+      if (newUseProjectNameDir) {
+        const projectNameAsPath = normilizePath(newProjectName);
+        if (newTargetFolder.endsWith(delimeter)) {
+          newTargetFolder = newTargetFolder.slice(0, -1);
+        }
+        newTargetFolder = [newTargetFolder, projectNameAsPath].join(delimeter);
+      }
+    }
+    else {
+      newUseProjectNameDir = false;
     }
 
     setState(
