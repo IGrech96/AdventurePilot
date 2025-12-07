@@ -25,6 +25,9 @@ contextBridge.exposeInMainWorld('applicationApi', {
         invokeGetAvailableItems: () => {
             return ipcRenderer.invoke('get-available-items', );
         },
+        invokeCreateScene: (parent) => {
+            return ipcRenderer.invoke('create-new-scene', parent);
+        },
     },
     file: {
         invokeSelectFolder: () => {

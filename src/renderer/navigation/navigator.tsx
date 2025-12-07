@@ -23,7 +23,7 @@ export default function Navigator() {
                 }
             }
 
-            setCanCreateNewNode(node.type == "scene" || node.type == 'scenes-root');
+            setCanCreateNewNode(node.type == "scene" || node.type == 'scenes-root' || node.type == 'npces-root' || node.type == "npc" );
             setCanSave(false);
         }
         const onItemChanged = (event: any, node: IFileDefinition) => {

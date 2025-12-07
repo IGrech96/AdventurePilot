@@ -29,18 +29,24 @@ export class applicationApi {
         onProjectItemClicked: (node: ProjectTreeItem) => {
             this.window.webContents.send('item-clicked', node);
         },
-        subscribe_handleGetAvailableItems: (callback: (event: any, ) => (IDefinition)[]) => {
+        subscribe_handleGetAvailableItems: (callback: (event: any, ) => Promise<(IDefinition)[]> | (IDefinition)[]) => {
             ipcMain.handle('get-available-items', callback);
         },
-        unsubscribe_handleGetAvailableItems: (callback: (event: any, ) => (IDefinition)[]) => {
+        unsubscribe_handleGetAvailableItems: (callback: (event: any, ) => Promise<(IDefinition)[]> | (IDefinition)[]) => {
             ipcMain.removeListener('get-available-items', callback);
+        },
+        subscribe_handleCreateScene: (callback: (event: any, parent?: IDefinition) => Promise<SceneDefinition | null> | SceneDefinition | null) => {
+            ipcMain.handle('create-new-scene', callback);
+        },
+        unsubscribe_handleCreateScene: (callback: (event: any, parent?: IDefinition) => Promise<SceneDefinition | null> | SceneDefinition | null) => {
+            ipcMain.removeListener('create-new-scene', callback);
         },
     }
     public file = {
-        subscribe_handleSelectFolder: (callback: (event: any, ) => string | null) => {
+        subscribe_handleSelectFolder: (callback: (event: any, ) => Promise<string | null> | string | null) => {
             ipcMain.handle('select-folder', callback);
         },
-        unsubscribe_handleSelectFolder: (callback: (event: any, ) => string | null) => {
+        unsubscribe_handleSelectFolder: (callback: (event: any, ) => Promise<string | null> | string | null) => {
             ipcMain.removeListener('select-folder', callback);
         },
         onDefaultProjectFolder: (path: string) => {
@@ -76,22 +82,22 @@ export class applicationApi {
         onFileChanged: (node: IFileDefinition) => {
             this.window.webContents.send('file-changed', node);
         },
-        subscribe_handleGetFilePreview: (callback: (event: any, filePath: string) => string) => {
+        subscribe_handleGetFilePreview: (callback: (event: any, filePath: string) => Promise<string> | string) => {
             ipcMain.handle('get-file-preview', callback);
         },
-        unsubscribe_handleGetFilePreview: (callback: (event: any, filePath: string) => string) => {
+        unsubscribe_handleGetFilePreview: (callback: (event: any, filePath: string) => Promise<string> | string) => {
             ipcMain.removeListener('get-file-preview', callback);
         },
-        subscribe_handleSaveItemImage: (callback: (event: any, node: IDefinition, imageName: string, data: Uint8Array<ArrayBuffer>) => string) => {
+        subscribe_handleSaveItemImage: (callback: (event: any, node: IDefinition, imageName: string, data: Uint8Array<ArrayBuffer>) => Promise<string> | string) => {
             ipcMain.handle('save-item-image', callback);
         },
-        unsubscribe_handleSaveItemImage: (callback: (event: any, node: IDefinition, imageName: string, data: Uint8Array<ArrayBuffer>) => string) => {
+        unsubscribe_handleSaveItemImage: (callback: (event: any, node: IDefinition, imageName: string, data: Uint8Array<ArrayBuffer>) => Promise<string> | string) => {
             ipcMain.removeListener('save-item-image', callback);
         },
-        subscribe_handleGetImageAsBase64: (callback: (event: any, path: string) => string) => {
+        subscribe_handleGetImageAsBase64: (callback: (event: any, path: string) => Promise<string> | string) => {
             ipcMain.handle('get-image-as-base64', callback);
         },
-        unsubscribe_handleGetImageAsBase64: (callback: (event: any, path: string) => string) => {
+        unsubscribe_handleGetImageAsBase64: (callback: (event: any, path: string) => Promise<string> | string) => {
             ipcMain.removeListener('get-image-as-base64', callback);
         },
     }

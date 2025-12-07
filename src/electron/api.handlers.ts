@@ -1,14 +1,16 @@
-import { applicationApi, ProjectConfiguration, ProjectTreeItem, IDefinition, IFileDefinition, asFileDefinition, SceneDefinition, CommonDefinition } from "./appApi.js";
+import { applicationApi, ProjectTreeItem, IDefinition, IFileDefinition, asFileDefinition, SceneDefinition, CommonDefinition } from "./appApi.js";
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
+import ConfigurationManager from "./config.js";
+import { NewItemDialog } from "./dialogs/create-new-item.js";
 
 export class ApiHandlers {
 
   constructor(
-    private api: applicationApi,
-    private projectFolder: string,
-    private config: ProjectConfiguration
+    private readonly api: applicationApi,
+    private readonly projectFolder: string,
+    private readonly configManager: ConfigurationManager
   ) {
 
   }
@@ -35,7 +37,7 @@ export class ApiHandlers {
     const onhandleReceiveOpenNode = (event: any, node: IDefinition) => {
       let content;
       const fileDefinition = asFileDefinition(node);
-      if (fileDefinition) {
+      if (fileDefinition && fs.existsSync(path.join(this.projectFolder, fileDefinition.file))) {
         content = fs.readFileSync(path.join(this.projectFolder, fileDefinition.file), 'utf8');
       }
       if (!content) {
@@ -93,6 +95,7 @@ export class ApiHandlers {
     }
 
     const onhandleGetAvailableItems = (event: any): (IDefinition)[] => {
+      const config = this.configManager.Configuration
       const locations: SceneDefinition[] = [];
       const vist = (scenes: SceneDefinition[]) => {
         scenes.forEach(element => {
@@ -103,17 +106,17 @@ export class ApiHandlers {
         });
       }
 
-      vist(this.config?.scenes ?? []);
+      vist(config.scenes ?? []);
 
       const result: (IDefinition)[] = [
         ...locations,
-        ...this.config?.npces ?? []
+        ...config.npces ?? []
       ];
 
-      if (this.config.common && this.config.common.file) {
-        const commonContent = fs.readFileSync(path.join(this.projectFolder, this.config.common.file), 'utf8');
+      if (config.common && config.common.file && fs.existsSync(path.join(this.projectFolder, config.common.file))) {
+        const commonContent = fs.readFileSync(path.join(this.projectFolder, config.common.file), 'utf8');
         const getCommonDef = (x: string): CommonDefinition => {
-          return { type: 'common', name: x, file: this.config.common.file };
+          return { type: 'common', name: x, file: config.common.file };
         }
         const sections = commonContent
           .matchAll(/^#\s+([^\n]+)/gm)
@@ -123,6 +126,16 @@ export class ApiHandlers {
         result.push(...sections.map(x => getCommonDef(x)))
       }
       return result;
+    }
+
+    const onHandleCreateScene = async (event: any, parent?: IDefinition): Promise<SceneDefinition | null> => {
+      const dialog = new NewItemDialog()
+      //TODO: check for duplicates
+      const result = await dialog.showDialog();
+      if (result) {
+        return this.configManager.addNewScene(result.name, parent);
+      }
+      return null;
     }
 
     this.api.file.subscribe_receiveOpenDefinition(onhandleReceiveOpenNode);
@@ -135,6 +148,7 @@ export class ApiHandlers {
 
     this.api.project.subscribe_receiveProjectItemClicked(onhandlerReceiveProjectItemClicked);
     this.api.project.subscribe_handleGetAvailableItems(onhandleGetAvailableItems);
+    this.api.project.subscribe_handleCreateScene(onHandleCreateScene);
 
     this.api.application.subscribe_receiveSaveRequest(onhandleReceiveSaveRequest);
 
@@ -149,6 +163,7 @@ export class ApiHandlers {
 
       this.api.project.unsubscribe_receiveProjectItemClicked(onhandlerReceiveProjectItemClicked);
       this.api.project.unsubscribe_handleGetAvailableItems(onhandleGetAvailableItems);
+      this.api.project.unsubscribe_handleCreateScene(onHandleCreateScene);
 
       this.api.application.unsubscribe_receiveSaveRequest(onhandleReceiveSaveRequest);
     }

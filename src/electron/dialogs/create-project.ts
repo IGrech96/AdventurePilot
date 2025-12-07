@@ -61,7 +61,7 @@ export class ProjectDialog {
   public showDialog(): Promise<{ name: string, path: string } | null> {
 
     return new Promise(async (resolve) => {
-      await this.mainWindow.loadURL('http://localhost:3000/dialog'); // Or use loadFile for production
+      await this.mainWindow.loadURL('http://localhost:3000/new-project-dialog'); // Or use loadFile for production
       this.mainWindow.on('closed', () => {
 
         if (this.name && this.path) {
@@ -72,6 +72,7 @@ export class ProjectDialog {
         }
       });
 
+      //TODO:
       this.api.file.onDefaultProjectFolder("C:\\Users\\ivang\\source\\repos\\dnd\\stories");
     });
   }

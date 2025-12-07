@@ -1,14 +1,99 @@
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
-import { ProjectConfiguration, SceneDefinition } from './appApi.js';
+import { IDefinition, ProjectConfiguration, SceneDefinition } from './appApi.js';
 
 export default class ConfigurationManager {
+
   private static readonly projectFile: string = "adventure.yaml";
   private static readonly commonFile: string = "common.yaml";
   private static readonly overviewFile: string = "overview.md";
 
-  public TryReadProjectConfigurationFile(projectFile: string): ProjectConfiguration | null {
+  private static readonly scenesDir: string = "scenes";
+  private static readonly imagesDir: string = "images";
+
+  private readonly projectFolder: string;
+
+  private constructor(
+    private readonly projectFile: string,
+    private readonly configuration: ProjectConfiguration) {
+    this.projectFolder = path.dirname(this.projectFile);
+  }
+
+  public get Configuration(): ProjectConfiguration {
+    return this.configuration
+  }
+
+  private static normilizeFileName(name: string): string {
+    // 1) Remove invalid filename characters (Windows, macOS, Linux safe set)
+    // Invalid: \ / : * ? " < > |
+    const invalidChars = /[\\/:*?"<>|]/g;
+    let normalized = name.replace(invalidChars, "");
+
+    // 2) Replace spaces with underscores
+    normalized = normalized.replace(/\s+/g, "_");
+
+    // 3) Convert to lowercase
+    normalized = normalized.toLowerCase();
+
+    return normalized;
+  }
+
+  private ensureSystemFolders() {
+    const sceneFolder = path.join(this.projectFolder, ConfigurationManager.scenesDir);
+    if (!fs.existsSync(sceneFolder)) {
+      fs.mkdirSync(sceneFolder);
+    }
+    const imageFolder = path.join(this.projectFolder, ConfigurationManager.imagesDir);
+    if (!fs.existsSync(imageFolder)) {
+      fs.mkdirSync(imageFolder);
+    }
+  }
+
+  public save() {
+    const data = yaml.dump(this.configuration);
+    if (!fs.existsSync(this.projectFolder)) {
+      fs.mkdirSync(this.projectFolder);
+    }
+    fs.writeFileSync(this.projectFile, data);
+
+    this.ensureSystemFolders();
+  }
+
+  public addNewScene(name: string, parent?: IDefinition) : SceneDefinition {
+
+    let foundParent: SceneDefinition | undefined;
+    const visitScens = (def: SceneDefinition) => {
+      if (parent && parent.name == def.name && parent.type == def.type) {
+        foundParent = def;
+        return;
+      }
+      def.scenes?.forEach(s => visitScens(s));
+    }
+
+    this.configuration.scenes.forEach(s => visitScens(s));
+
+    const newItem: SceneDefinition = {
+      scenes: [],
+      name: name,
+      type: 'scene',
+      file: path.join(ConfigurationManager.scenesDir, ConfigurationManager.normilizeFileName(name + '.md'))
+    }
+
+    if (foundParent) {
+      foundParent.scenes.push(newItem);
+    }
+    else {
+      this.configuration.scenes.push(newItem);
+    }
+
+    this.save();
+    fs.writeFileSync(path.join(this.projectFolder, newItem.file), `# ${name}`)
+
+    return newItem;
+  }
+
+  public static tryReadProjectConfigurationFile(projectFile: string): ConfigurationManager | null {
     try {
       const mainConfig = projectFile;
       const fileContents = fs.readFileSync(mainConfig, 'utf8');
@@ -36,21 +121,21 @@ export default class ConfigurationManager {
         def.scenes?.forEach(s => visitScens(s));
       }
 
-      data.scenes.forEach(s => visitScens(s));
+      data.scenes?.forEach(s => visitScens(s));
 
-      return data;
+      return new ConfigurationManager(projectFile, data);
     } catch (e) {
       console.error('Error reading or parsing YAML:', e);
       return null;
     }
   }
 
-  public TryReadProjectConfigurationFolder(projectFolder: string): ProjectConfiguration | null {
+  public static tryReadProjectConfigurationFolder(projectFolder: string): ConfigurationManager | null {
     const mainConfig = path.join(projectFolder, ConfigurationManager.projectFile);
-    return this.TryReadProjectConfigurationFile(mainConfig);
+    return ConfigurationManager.tryReadProjectConfigurationFile(mainConfig);
   }
 
-  public CreateEmpty(name: string, projectFolder: string): ProjectConfiguration {
+  public static createEmpty(name: string, projectFolder: string): ConfigurationManager {
     const config: ProjectConfiguration = {
       overview: {
         name: name,
@@ -66,13 +151,10 @@ export default class ConfigurationManager {
       npces: []
     };
 
-    const data = yaml.dump(config);
-    if (!fs.existsSync(projectFolder)){
-      fs.mkdirSync(projectFolder);
-    }
-    fs.writeFileSync(path.join(projectFolder, ConfigurationManager.projectFile), data);
-
-    return config;
+    const projectPath = path.join(projectFolder, ConfigurationManager.projectFile);
+    const manager = new ConfigurationManager(projectPath, config);
+    manager.save();
+    return manager;
   }
 }
 

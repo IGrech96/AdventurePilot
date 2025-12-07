@@ -2,6 +2,14 @@
 import fs from 'fs'
 import yaml from 'js-yaml';
 
+function normilizePreloadArgNames(name: string) : string{
+  if (name.endsWith('?')){
+    name = name.slice(0, name.length - 1);
+  }
+
+  return name;
+}
+
 
 const args = process.argv.slice(2)
 
@@ -92,8 +100,8 @@ if (data && data.api) {
           electronMainApi.push(`${indent(2)}},`);
         }
         else if (type == 'send') {
-          preloadLines.push(`${indent(2)}${methodName}: (${argNames.join(', ')}) => {`);
-          preloadLines.push(`${indent(3)}ipcRenderer.send('${data.api[apiName][domainName][methodName].channel}', ${argNames.join(', ')});`);
+          preloadLines.push(`${indent(2)}${methodName}: (${argNames.map(x => normilizePreloadArgNames(x)).join(', ')}) => {`);
+          preloadLines.push(`${indent(3)}ipcRenderer.send('${data.api[apiName][domainName][methodName].channel}', ${argNames.map(x => normilizePreloadArgNames(x)).join(', ')});`);
           preloadLines.push(`${indent(2)}},`);
 
           const argNamesTs = args.map(x => `${Object.keys(x)[0]}: ${x[Object.keys(x)[0]]}`);
@@ -108,9 +116,10 @@ if (data && data.api) {
           electronMainApi.push(`${indent(3)}ipcMain.removeListener('${channel}', callback);`)
           electronMainApi.push(`${indent(2)}},`);
         } else {
-          const ret = data.api[apiName][domainName][methodName].return;
-          preloadLines.push(`${indent(2)}${methodName}: (${argNames.join(', ')}) => {`);
-          preloadLines.push(`${indent(3)}return ipcRenderer.invoke('${data.api[apiName][domainName][methodName].channel}', ${argNames.join(', ')});`);
+          const sourceReturn = data.api[apiName][domainName][methodName].return;
+          const ret = `Promise<${sourceReturn}> | ${sourceReturn}`;
+          preloadLines.push(`${indent(2)}${methodName}: (${argNames.map(x => normilizePreloadArgNames(x)).join(', ')}) => {`);
+          preloadLines.push(`${indent(3)}return ipcRenderer.invoke('${data.api[apiName][domainName][methodName].channel}', ${argNames.map(x => normilizePreloadArgNames(x)).join(', ')});`);
           preloadLines.push(`${indent(2)}},`);
 
           const argNamesTs = args.map(x => `${Object.keys(x)[0]}: ${x[Object.keys(x)[0]]}`);

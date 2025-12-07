@@ -71,3 +71,21 @@ export function findPositionInParent(collection: ProjectTreeViewItem[], id: stri
 
   return recursiveSearch(collection[0])!
 }
+
+function getLastId(collection: ProjectTreeViewItem[]): number {
+  let currentMaxId = 0;
+  for (let index = 0; index < collection.length; index++) {
+    const item = collection[index];
+    currentMaxId = Math.max(Number(item.id), currentMaxId);
+
+    if (item.children){
+      currentMaxId = Math.max(currentMaxId, getLastId(item.children))
+    }
+  }
+  return currentMaxId;
+}
+
+export function getNextId(collection: ProjectTreeViewItem[]): number {
+  const lastId = getLastId(collection);
+  return lastId + 1;
+}

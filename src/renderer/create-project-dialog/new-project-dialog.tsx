@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import './project-dialog.css'; // Optional: for styling
+import './new-project-dialog.css'; // Optional: for styling
 
 interface Props {
   // onCreate: (projectName: string, targetFolder: string) => void;
   // onCancel: () => void;
 }
 
-export const ProjectDialog: React.FC<Props> = () => {
+export const NewProjectDialog: React.FC<Props> = () => {
   const [state, setState] = useState(
     {
       projectName: '',

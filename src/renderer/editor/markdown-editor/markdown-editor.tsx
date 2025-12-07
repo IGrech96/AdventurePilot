@@ -41,7 +41,12 @@ export default function MarkdownEditor({ plainText, node }: { plainText?: string
       .applicationApi
       .project
       .invokeGetAvailableItems()
-      .then(data => {
+      .then(async data => {
+
+        if (data instanceof Promise){
+          data = await data;
+        }
+
         const newData = data.map(x => ({ name: x.name, node: x }));
         suggestions.length = 0;
         suggestions.push(...newData);

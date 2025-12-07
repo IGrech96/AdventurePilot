@@ -6,7 +6,8 @@ import type { TreeItemProps } from '@mui/x-tree-view/TreeItem';
 import { Box } from '@mui/material';
 import * as React from 'react';
 import { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
-import { findNode, findPositionInParent, ProjectTreeViewItem, toTree } from './project-tree-item';
+import { findNode, findPositionInParent, getNextId, ProjectTreeViewItem, toTree } from './project-tree-item';
+import { Exception } from 'sass-embedded';
 
 type StoryTreeProperties = {
 
@@ -22,47 +23,63 @@ type dragndropposition = "before" | "on" | "after";
 const initialItems: ProjectTreeViewItem[] = toTree(null);
 
 function ProjectTree(properties: StoryTreeProperties, ref: React.Ref<StoryTreeHandle>) {
-  const [selectedItem, setSelectedItem] = React.useState<string|null>(null);
+  const [selectedItem, setSelectedItem] = React.useState<string | null>(null);
   const apiRef = useTreeViewApiRef();
 
   useImperativeHandle(ref, () => ({
-    createNew() {
-      //TODO:
-      // if (selectedItem) {
-      //   const reordered = [...items];
+    async createNew() {
+      if (selectedItem) {
+        const reordered = [...items];
 
-      //   const next = {
-      //     id: "7",
-      //     label: "New ",
-      //   }
+        if (selectedItem !== "0") {
+          const [parent, index] = findPositionInParent(reordered, selectedItem);
 
-      //   if (selectedItem !== "0") {
-      //     const [parent, index] = findPositionInParent(reordered, selectedItem);
-      //     parent.children![index].children ??= [];
-      //     parent.children![index].children.push(next)
+          let definition: SceneDefinition | NpcDefinition | undefined = undefined;
+          let type: nodetype = 'common';
+          if (parent.children![index].type == 'scene' || parent.children![index].type == 'scenes-root') {
+            type = 'scene';
+            const maybeScene = await window.applicationApi.project.invokeCreateScene(parent.children![index].source);
+            if (!maybeScene)
+            {
+              return;
+            }
+            definition = maybeScene;
+          }
+          else {
+            throw Error("Unssuported");
+          }
+          const next: ProjectTreeViewItem = {
+            id: getNextId(reordered).toString(),
+            label: definition.name,
+            type: type,
+            children: [],
+            source: definition
+          }
 
-      //     apiRef.current?.setItemExpansion({
-      //       itemId: parent.children![index].id,
-      //       shouldBeExpanded: true
-      //     });
+          parent.children![index].children ??= [];
+          parent.children![index].children.push(next)
 
-      //   }
-      //   else {
-      //     reordered[0].children ??= [];
-      //     reordered[0].children.push(next);
-      //     apiRef.current?.setItemExpansion({
-      //       itemId: reordered[0].id,
-      //       shouldBeExpanded: true
-      //     });
-      //   }
-
-      //   setItems(reordered);
-      //   apiRef.current?.setItemSelection({
-      //     itemId: next.id,
-      //     shouldBeSelected: true,
-      //     keepExistingSelection: false
-      //   })
-      // }
+          apiRef.current?.setItemExpansion({
+            itemId: parent.children![index].id,
+            shouldBeExpanded: true
+          });
+          setItems(reordered);
+          apiRef.current?.setItemSelection({
+            itemId: next.id,
+            shouldBeSelected: true,
+            keepExistingSelection: false
+          })
+        }
+        else {
+          throw Error("Unssuported");
+          // reordered[0].children ??= [];
+          // reordered[0].children.push(next);
+          // apiRef.current?.setItemExpansion({
+          //   itemId: reordered[0].id,
+          //   shouldBeExpanded: true
+          // });
+        }
+      }
     },
   }));
 

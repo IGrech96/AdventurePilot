@@ -69,18 +69,16 @@ export default class Main {
 
   public Open(path: string): boolean {
 
-    const manager = new ConfigurationManager();
+    const manager = ConfigurationManager.tryReadProjectConfigurationFolder(path);
 
-    const config = manager.TryReadProjectConfigurationFolder(path);
-    if (config) {
+    if (manager) {
       if (this.handlersUnsubscriber){
         this.handlersUnsubscriber();
       }
 
-
-      this.handlers = new ApiHandlers(this.api!, path, config);
+      this.handlers = new ApiHandlers(this.api!, path, manager);
       this.handlersUnsubscriber = this.handlers.Subscribe();
-      this.api?.project.onProjectOpen(config);
+      this.api?.project.onProjectOpen(manager.Configuration);
 
       return true;
     }
@@ -88,16 +86,14 @@ export default class Main {
   }
 
   public CreateNew(name: string, path: string): void {
-    const manager = new ConfigurationManager();
-
-    const config = manager.CreateEmpty(name, path);
+    const manager = ConfigurationManager.createEmpty(name, path);
 
     if (this.handlersUnsubscriber){
         this.handlersUnsubscriber();
       }
 
-    this.handlers = new ApiHandlers(this.api!, path, config);
+    this.handlers = new ApiHandlers(this.api!, path, manager);
     this.handlersUnsubscriber = this.handlers.Subscribe();
-    this.api?.project.onProjectOpen(config);
+    this.api?.project.onProjectOpen(manager.Configuration);
   }
 }

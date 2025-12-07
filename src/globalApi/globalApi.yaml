@@ -23,6 +23,11 @@ api:
       invokeGetAvailableItems:
         channel: 'get-available-items'
         return: (IDefinition)[]
+      invokeCreateScene:
+        channel: 'create-new-scene'
+        args:
+        - parent?: IDefinition
+        return: SceneDefinition | null
     file:
       invokeSelectFolder:
         channel: 'select-folder'

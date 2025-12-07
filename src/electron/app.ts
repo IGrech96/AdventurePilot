@@ -1,6 +1,6 @@
 import { app, BrowserWindow, Menu, MenuItem, dialog } from 'electron';
 import Main from './main.js';
-import { ProjectDialog } from './create-project/create-project.js'
+import { ProjectDialog } from './dialogs/create-project.js'
 
 const main = new Main(app, BrowserWindow);
 

@@ -11,10 +11,11 @@ declare global {
                 sendProjectItemClicked: (node: ProjectTreeItem) => void;
                 subscribe_onProjectItemClicked: (callback: (event: any, node: ProjectTreeItem) => void) => void;
                 unsubscribe_onProjectItemClicked: (callback: (event: any, node: ProjectTreeItem) => void) => void;
-                invokeGetAvailableItems: () => Promise<(IDefinition)[]>;
+                invokeGetAvailableItems: () => Promise<Promise<(IDefinition)[]> | (IDefinition)[]>;
+                invokeCreateScene: (parent?: IDefinition) => Promise<Promise<SceneDefinition | null> | SceneDefinition | null>;
             },
             file: {
-                invokeSelectFolder: () => Promise<string | null>;
+                invokeSelectFolder: () => Promise<Promise<string | null> | string | null>;
                 subscribe_onDefaultProjectFolder: (callback: (event: any, path: string) => void) => void;
                 unsubscribe_onDefaultProjectFolder: (callback: (event: any, path: string) => void) => void;
                 sendOpenDefinition: (node: IDefinition) => void;
@@ -25,9 +26,9 @@ declare global {
                 sendFileChanged: (node: IFileDefinition) => void;
                 subscribe_onFileChanged: (callback: (event: any, node: IFileDefinition) => void) => void;
                 unsubscribe_onFileChanged: (callback: (event: any, node: IFileDefinition) => void) => void;
-                invokeGetFilePreview: (filePath: string) => Promise<string>;
-                invokeSaveItemImage: (node: IDefinition, imageName: string, data: Uint8Array<ArrayBuffer>) => Promise<string>;
-                invokeGetImageAsBase64: (path: string) => Promise<string>;
+                invokeGetFilePreview: (filePath: string) => Promise<Promise<string> | string>;
+                invokeSaveItemImage: (node: IDefinition, imageName: string, data: Uint8Array<ArrayBuffer>) => Promise<Promise<string> | string>;
+                invokeGetImageAsBase64: (path: string) => Promise<Promise<string> | string>;
             },
             application: {
                 sendSaveRequest: () => void;
