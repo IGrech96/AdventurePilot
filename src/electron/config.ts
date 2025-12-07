@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
-import { IDefinition, ProjectConfiguration, SceneDefinition } from './appApi.js';
+import { IDefinition, IFileDefinition, ProjectConfiguration, SceneDefinition } from './appApi.js';
 
 export default class ConfigurationManager {
 
@@ -60,7 +60,49 @@ export default class ConfigurationManager {
     this.ensureSystemFolders();
   }
 
-  public addNewScene(name: string, parent?: IDefinition) : SceneDefinition {
+  public saveNodeContent(content: any, node: IFileDefinition) {
+    const data = node.type == 'npc' ? yaml.dump(content) : content;
+
+    fs.writeFileSync(path.join(this.projectFolder, node.file), data, {
+      encoding: 'utf-8'
+    });
+  }
+
+  public saveImage(node: IFileDefinition, name: string, data: Uint8Array<ArrayBuffer>) {
+    const rootFolder = ConfigurationManager.imagesDir;
+
+    const subfolder = path.basename(node.file, path.extname(node.file));
+
+    const fullDirPath = path.join(this.projectFolder, rootFolder, subfolder);
+    const fullFilePath = path.join(fullDirPath, name);
+
+    if (!fs.existsSync(fullDirPath)) {
+      fs.mkdirSync(fullDirPath, { recursive: true });
+    }
+    fs.writeFileSync(fullFilePath, data, { flush: true });
+    return path.join(this.projectFolder, rootFolder, subfolder, name).replace(/\\/g, '/');
+  }
+
+  public readImage(filePath: string) : NonSharedBuffer {
+    let content = fs.readFileSync(path.join(this.projectFolder, filePath));
+    return content;
+  }
+
+  public readNodeContent(node: IFileDefinition): any {
+    let content;
+    if (fs.existsSync(path.join(this.projectFolder, node.file))) {
+      content = fs.readFileSync(path.join(this.projectFolder, node.file), 'utf8');
+    }
+    if (!content) {
+      content = ""
+    }
+    if (node?.type == "npc") {
+      content = yaml.load(content)
+    }
+    return content;
+  }
+
+  public addNewScene(name: string, parent?: IDefinition): SceneDefinition {
 
     let foundParent: SceneDefinition | undefined;
     const visitScens = (def: SceneDefinition) => {

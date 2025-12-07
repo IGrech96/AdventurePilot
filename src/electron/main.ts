@@ -76,7 +76,7 @@ export default class Main {
         this.handlersUnsubscriber();
       }
 
-      this.handlers = new ApiHandlers(this.api!, path, manager);
+      this.handlers = new ApiHandlers(this.api!, manager);
       this.handlersUnsubscriber = this.handlers.Subscribe();
       this.api?.project.onProjectOpen(manager.Configuration);
 
@@ -92,7 +92,7 @@ export default class Main {
         this.handlersUnsubscriber();
       }
 
-    this.handlers = new ApiHandlers(this.api!, path, manager);
+    this.handlers = new ApiHandlers(this.api!, manager);
     this.handlersUnsubscriber = this.handlers.Subscribe();
     this.api?.project.onProjectOpen(manager.Configuration);
   }

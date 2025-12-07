@@ -1,7 +1,4 @@
 import { applicationApi, ProjectTreeItem, IDefinition, IFileDefinition, asFileDefinition, SceneDefinition, CommonDefinition } from "./appApi.js";
-import fs from 'fs';
-import path from 'path';
-import yaml from 'js-yaml';
 import ConfigurationManager from "./config.js";
 import { NewItemDialog } from "./dialogs/create-new-item.js";
 
@@ -9,7 +6,6 @@ export class ApiHandlers {
 
   constructor(
     private readonly api: applicationApi,
-    private readonly projectFolder: string,
     private readonly configManager: ConfigurationManager
   ) {
 
@@ -18,16 +14,11 @@ export class ApiHandlers {
   public Subscribe(): () => void {
 
     const onhandleReceiveSaveMarkdown = (event: any, content: string, node: IFileDefinition) => {
-      fs.writeFileSync(path.join(this.projectFolder, node.file), content, {
-        encoding: 'utf-8'
-      });
+      this.configManager.saveNodeContent(content, node);
     }
 
     const onhandleReceiveSaveCharacter = (event: any, content: any, node: IFileDefinition) => {
-      const data = yaml.dump(content);
-      fs.writeFileSync(path.join(this.projectFolder, node.file), data, {
-        encoding: 'utf-8'
-      });
+      this.configManager.saveNodeContent(content, node);
     }
 
     const onhandlerReceiveProjectItemClicked = (event: any, node: ProjectTreeItem) => {
@@ -37,15 +28,10 @@ export class ApiHandlers {
     const onhandleReceiveOpenNode = (event: any, node: IDefinition) => {
       let content;
       const fileDefinition = asFileDefinition(node);
-      if (fileDefinition && fs.existsSync(path.join(this.projectFolder, fileDefinition.file))) {
-        content = fs.readFileSync(path.join(this.projectFolder, fileDefinition.file), 'utf8');
+      if (fileDefinition) {
+        content = this.configManager.readNodeContent(fileDefinition);
       }
-      if (!content) {
-        content = ""
-      }
-      if (fileDefinition?.type == "npc") {
-        content = yaml.load(content)
-      }
+
       this.api.file.ondefinitionOpen(content, node);
     }
 
@@ -58,7 +44,12 @@ export class ApiHandlers {
     }
 
     const onhandleGetFilePreview = (event: any, filePath: string): string => {
-      let content = fs.readFileSync(path.join(this.projectFolder, filePath), 'utf8');
+      let content = this.configManager.readNodeContent({
+        file: filePath,
+        name: '-',
+        type: "common",
+      });
+
       if (!content) {
         content = ""
       }
@@ -71,23 +62,15 @@ export class ApiHandlers {
       name: string,
       data: Uint8Array<ArrayBuffer>): string => {
 
-      const rootFolder = "images";
       const fileDefinition = asFileDefinition(node);
-
-      const subfolder = fileDefinition ? path.basename(fileDefinition.file, path.extname(fileDefinition.file)) : node.type
-
-      const fullDirPath = path.join(this.projectFolder, rootFolder, subfolder);
-      const fullFilePath = path.join(fullDirPath, name);
-
-      if (!fs.existsSync(fullDirPath)) {
-        fs.mkdirSync(fullDirPath, { recursive: true });
+      if (fileDefinition) {
+        return this.configManager.saveImage(fileDefinition, name, data);
       }
-      fs.writeFileSync(fullFilePath, data, { flush: true });
-      return path.join('/', rootFolder, subfolder, name).replace(/\\/g, '/');
+      return '';
     }
 
     const onhandlerGetImageAsBase64 = (event: any, filePath: string): string => {
-      let content = fs.readFileSync(path.join(this.projectFolder, filePath)).toString('base64');
+      let content = this.configManager.readImage(filePath).toString('base64');
       if (!content) {
         content = ""
       }
@@ -113,8 +96,8 @@ export class ApiHandlers {
         ...config.npces ?? []
       ];
 
-      if (config.common && config.common.file && fs.existsSync(path.join(this.projectFolder, config.common.file))) {
-        const commonContent = fs.readFileSync(path.join(this.projectFolder, config.common.file), 'utf8');
+      if (config.common) {
+        const commonContent = this.configManager.readNodeContent(config.common) as string;
         const getCommonDef = (x: string): CommonDefinition => {
           return { type: 'common', name: x, file: config.common.file };
         }
@@ -168,9 +151,4 @@ export class ApiHandlers {
       this.api.application.unsubscribe_receiveSaveRequest(onhandleReceiveSaveRequest);
     }
   }
-
-
 }
-
-
-
